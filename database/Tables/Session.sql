@@ -1,0 +1,11 @@
+CREATE TABLE Session
+(
+    Key VARCHAR(32) UNIQUE NOT NULL,
+    User_Id INT NOT NULL,
+    Refresh_Token VARCHAR(32) NOT NULL,
+    Expires DATETIME NOT NULL,
+    Created DATETIME NOT NULL,
+    Deactivated DATETIME NOT NULL DEFAULT NULL,
+    PRIMARY KEY (Key),
+    FOREIGN KEY (User_Id) REFERENCES User(User_Id)
+);
