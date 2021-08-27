@@ -1,0 +1,27 @@
+{
+  "name": "hergbot-auth-server",
+  "version": "1.0.0",
+  "description": "A central service to manage authentication for HergBot applications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HergBot/auth-server.git"
+  },
+  "keywords": [
+    "hergbot",
+    "auth"
+  ],
+  "author": "Justin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HergBot/auth-server/issues"
+  },
+  "homepage": "https://github.com/HergBot/auth-server#readme",
+  "dependencies": {
+    "musqrat": "^0.1.0",
+    "typescript": "^4.3.5"
+  }
+}
