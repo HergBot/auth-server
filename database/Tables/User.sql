@@ -6,4 +6,6 @@ CREATE TABLE User
     Email VARCHAR(256) NOT NULL,
     Created DATETIME NOT NULL,
     Deactivated DATETIME DEFAULT NULL,
+    PRIMARY KEY (User_Id),
+    FOREIGN KEY (Service_Id) REFERENCES Service(Service_Id)
 );

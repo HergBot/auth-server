@@ -8,5 +8,5 @@ CREATE TABLE Password
     Created DATETIME NOT NULL,
     Deactivated DATETIME DEFAULT NULL,
     PRIMARY KEY (Password_Id),
-    FOREIGN KEY (User_Id) REFERENCES User(User_Id),
+    FOREIGN KEY (User_Id) REFERENCES User(User_Id)
 );
