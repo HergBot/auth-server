@@ -1,6 +1,8 @@
+**/build/
 **/coverage/
 **/dist/
 **/node_modules/
+**/.env
 
 **/.vs/
 **/bin/
