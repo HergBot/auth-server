@@ -1,14 +1,13 @@
+import { InsertStatement } from "musqrat/dist/statement";
 import ServiceController from "../../src/controllers/service.controller";
 import Service from "../../src/schemas/service.schema";
 import TestLogger from "../data/test-logger";
-
-jest.mock("../../src/schemas/service.schema");
-jest.mock("../data/test-logger");
+import { TEST_SERVICE } from "../data/test-service";
 
 const TEST_LOGGER = new TestLogger();
 
 describe("ServiceController", () => {
-    let controller;
+    let controller: ServiceController;
 
     beforeEach(() => {
         controller = new ServiceController(TEST_LOGGER);
@@ -18,7 +17,14 @@ describe("ServiceController", () => {
 
     describe("createService", () => {
         beforeEach(() => {
-            Service.insert.mockResolvedValue;
+            jest.spyOn(InsertStatement.prototype, "exec").mockImplementation(
+                () => Promise.resolve([TEST_SERVICE])
+            );
+        });
+
+        test("test stub", async () => {
+            const res = await controller.createService(TEST_SERVICE);
+            console.log(res);
         });
     });
 
