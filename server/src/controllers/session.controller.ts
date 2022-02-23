@@ -1,5 +1,5 @@
-import { SetClause } from "musqrat/dist/statement";
-import { OptionalMulti } from "musqrat/dist/utilities";
+import { isNil } from "lodash";
+import { OptionalMulti, SetClause } from "musqrat";
 
 import { ILogger } from "../lib/logger";
 import Session, { ISession } from "../schemas/session.schema";
@@ -30,12 +30,12 @@ class SessionController extends BaseController {
         modified: Partial<ISession>
     ): Promise<ISession | null | undefined> {
         const updates = getUpdates(modified);
-        if (updates.length === 0) {
+        if (isNil(updates)) {
             return null;
         }
         try {
             const updated = await Session.update(
-                updates as OptionalMulti<SetClause<ISession>>
+                updates
             )
                 .where("Session_Id", "=", sessionId)
                 .exec();

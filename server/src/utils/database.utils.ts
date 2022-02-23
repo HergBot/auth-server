@@ -1,11 +1,13 @@
 import { isNil, isUndefined } from "lodash";
 import {
     AggregationCondition,
+    OptionalEmptyMulti,
+    OptionalMulti,
     SetClause,
     WhereAggregation,
     WhereChain,
     WhereClause,
-} from "musqrat/dist/statement";
+} from "musqrat";
 
 type ConditionalOptions = {
     type?: "single" | "range" | "set";
@@ -29,13 +31,20 @@ type ConditionalParam<Schema, Query> = {
     }
 };*/
 
-export const getUpdates = <Schema>(modified: Schema): SetClause<Schema>[] => {
-    const updates: SetClause<Schema>[] = [];
+/*export const getUpdates = <Schema>(
+    modified: Schema
+): OptionalMulti<SetClause<Schema>> | null => {
+    let updates: OptionalMulti<SetClause<Schema>> | null = null;
     let key: keyof Schema;
     for (key in modified) {
         if (!isUndefined(modified[key])) {
-            updates.push({ field: key, value: modified[key] });
+            const set: SetClause<Schema> = { field: key, value: modified[key] };
+            if (isNil(updates)) {
+                updates = [set];
+            } else {
+                updates.push(set);
+            }
         }
     }
     return updates;
-};
+};*/
