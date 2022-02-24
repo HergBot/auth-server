@@ -3,6 +3,8 @@ import {
     SelectStatement,
     mockInsert,
     mockSelect,
+    UpdateStatement,
+    mockUpdate,
 } from "musqrat";
 import ServiceController from "../../src/controllers/service.controller";
 import Service, { IService } from "../../src/schemas/service.schema";
@@ -12,16 +14,16 @@ import { TEST_SERVICE } from "../data/test-service";
 const TEST_LOGGER = new TestLogger();
 const GENERIC_ERROR = "Generic Error";
 
-describe("ServiceController", () => {
+describe("[CLASS]: ServiceController", () => {
     let controller: ServiceController;
 
     beforeEach(() => {
         controller = new ServiceController(TEST_LOGGER);
     });
 
-    describe("constructor", () => {});
+    describe("[METHOD]: constructor", () => {});
 
-    describe("createService", () => {
+    describe("[METHOD]: create", () => {
         let insertSpy: jest.SpyInstance<InsertStatement<IService>>;
 
         afterEach(() => {
@@ -55,7 +57,7 @@ describe("ServiceController", () => {
         });
     });
 
-    describe("getService", () => {
+    describe("[METHOD]: find", () => {
         let selectSpy: jest.SpyInstance<SelectStatement<IService>>;
 
         afterEach(() => {
@@ -72,7 +74,7 @@ describe("ServiceController", () => {
             });
 
             test("should throw an error", async () => {
-                const result = await controller.get(1);
+                const result = await controller.find(1);
                 expect(result).toEqual(undefined);
             });
         });
@@ -83,7 +85,7 @@ describe("ServiceController", () => {
             });
 
             test("should return null", async () => {
-                const result = await controller.get(1);
+                const result = await controller.find(1);
                 expect(result).toEqual(null);
             });
         });
@@ -97,13 +99,13 @@ describe("ServiceController", () => {
             });
 
             test("should return an empty array", async () => {
-                const result = await controller.get(1);
+                const result = await controller.find(1);
                 expect(result).toEqual(TEST_SERVICE);
             });
         });
     });
 
-    describe("getServices", () => {
+    describe("[METHOD]: query", () => {
         let selectSpy: jest.SpyInstance<SelectStatement<IService>>;
 
         afterEach(() => {
@@ -153,6 +155,72 @@ describe("ServiceController", () => {
                     TEST_SERVICE,
                 ]);
             });
+        });
+    });
+
+    describe("[METHOD]: update", () => {
+        let updateSpy: jest.SpyInstance<
+            UpdateStatement<IService, "Service_Id">
+        >;
+
+        afterEach(() => {
+            updateSpy.mockRestore();
+        });
+
+        describe("when there is an error updating", () => {
+            beforeEach(() => {
+                updateSpy = mockUpdate<IService, "Service_Id">(
+                    Service,
+                    [{ field: "Name", value: "another" }],
+                    [TEST_SERVICE],
+                    GENERIC_ERROR
+                );
+            });
+
+            it("should return undefined", async () => {
+                const result = await controller.update(1, { Name: "another" });
+                expect(result).toEqual(undefined);
+            });
+        });
+
+        describe("when there are no updates made", () => {
+            beforeEach(() => {
+                updateSpy = mockUpdate<IService, "Service_Id">(
+                    Service,
+                    [{ field: "Name", value: "another" }],
+                    []
+                );
+            });
+
+            it("should return undefined", async () => {
+                const result = await controller.update(999, {
+                    Name: "another",
+                });
+                expect(result).toEqual(null);
+            });
+        });
+
+        describe("when an update is made", () => {
+            const updated = { ...TEST_SERVICE, Name: "another" };
+            beforeEach(() => {
+                updateSpy = mockUpdate<IService, "Service_Id">(
+                    Service,
+                    [{ field: "Name", value: "another" }],
+                    [updated]
+                );
+            });
+
+            it("should return undefined", async () => {
+                const result = await controller.update(1, {
+                    Name: "another",
+                });
+                expect(result).toEqual(updated);
+            });
+        });
+
+        it("should return null when there are no valid updates", async () => {
+            const result = await controller.update(1, {});
+            expect(result).toEqual(null);
         });
     });
 });

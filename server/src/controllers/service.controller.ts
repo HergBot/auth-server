@@ -125,7 +125,7 @@ class ServiceController {
         };
     }*/
 
-    private createAggregation(
+    /*private createAggregation(
         query: IServiceQuery
     ): WhereAggregation<IService> {
         const agg: WhereAggregation<IService> = {};
@@ -165,7 +165,7 @@ class ServiceController {
             },
         ];
         return agg;
-    }
+    }*/
 }
 
 export default ServiceController;
