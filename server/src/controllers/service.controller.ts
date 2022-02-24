@@ -5,6 +5,7 @@ import { WhereAggregation, getUpdates } from "musqrat";
 import { MAX_DATE, MIN_DATE } from "../constants/common.constants";
 import { ILogger } from "../lib/logger";
 import Service, { IService } from "../schemas/service.schema";
+import DeactivateController from "./common/deactivate.controller";
 
 type IServiceQuery = {
     createdStart: Date;
@@ -14,101 +15,13 @@ type IServiceQuery = {
     active: boolean;
 };
 
-class ServiceController {
-    private _logger: ILogger;
-
+class ServiceController extends DeactivateController<
+    IService,
+    "Service_Id",
+    "Deactivated"
+> {
     constructor(logger: ILogger) {
-        this._logger = logger;
-    }
-
-    public async create(
-        service: Omit<IService, "Service_Id">
-    ): Promise<Array<IService> | undefined> {
-        try {
-            return await Service.insert(service).exec();
-        } catch (err) {
-            this._logger.error("Failed to create Service", "create");
-            this._logger.debug(`Service: ${JSON.stringify(service)}`, "create");
-            this._logger.exception(err, "create");
-            return undefined;
-        }
-    }
-
-    public async find(
-        serviceId: IService["Service_Id"]
-    ): Promise<IService | null | undefined> {
-        try {
-            const result = await Service.select()
-                .where("Service_Id", "=", serviceId)
-                .exec();
-            return result.length > 0 ? result[0] : null;
-        } catch (err) {
-            this._logger.error("Failed to find Service", "find");
-            this._logger.debug(`Service Id: ${serviceId}`, "find");
-            this._logger.exception(err, "find");
-            return undefined;
-        }
-    }
-
-    public async query(): Promise<Array<IService> | undefined> {
-        try {
-            const result = await Service.select().exec();
-            return result;
-        } catch (err) {
-            this._logger.error("Failed to query Services", "query");
-            //this._logger.debug(`Query: ${}`, "query");
-            this._logger.exception(err, "query");
-            return undefined;
-        }
-    }
-
-    public async update(
-        serviceId: IService["Service_Id"],
-        modified: Omit<Partial<IService>, "Service_Id">
-    ): Promise<IService | null | undefined> {
-        const updates = getUpdates(modified);
-        if (isNil(updates)) {
-            this._logger.warning(
-                "Attempted to update a service with no valid updates",
-                "update"
-            );
-            this._logger.debug(
-                `Service_Id: ${serviceId}, modified: ${JSON.stringify(
-                    modified
-                )}`,
-                "update"
-            );
-            return null;
-        }
-        try {
-            const updated = await Service.update(updates)
-                .where("Service_Id", "=", serviceId)
-                .exec();
-            const result = updated.length > 0 ? updated[0] : null;
-            if (isNil(result)) {
-                this._logger.warning(
-                    "Attempted to update a service but no updates were made",
-                    "update"
-                );
-                this._logger.debug(
-                    `Service_Id: ${serviceId}, modified: ${JSON.stringify(
-                        modified
-                    )}`,
-                    "update"
-                );
-            }
-            return result;
-        } catch (err) {
-            this._logger.error("Failed to update Service", "update");
-            this._logger.debug(
-                `Service_Id: ${serviceId}, modified: ${JSON.stringify(
-                    modified
-                )}, updates: ${JSON.stringify(updates)}`,
-                "update"
-            );
-            this._logger.exception(err, "update");
-            return undefined;
-        }
+        super(logger, Service, "Service_Id", "Deactivated");
     }
 
     /*private defaultQuery(query: Partial<IServiceQuery>): IServiceQuery {

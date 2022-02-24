@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { getUpdates, SchemaUpdate, Table } from "musqrat";
 
-import { ILogger } from "../lib/logger";
+import { ILogger } from "../../lib/logger";
 
 class BaseController<Schema, PrimaryKey extends keyof Schema> {
     protected _idField: PrimaryKey;
@@ -20,9 +20,10 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
 
     public async create(
         newValue: Omit<Schema, PrimaryKey>
-    ): Promise<Array<Schema> | undefined> {
+    ): Promise<Schema | null | undefined> {
         try {
-            return await this._table.insert(newValue).exec();
+            const result = await this._table.insert(newValue).exec();
+            return this.getSingleResult(result);
         } catch (err) {
             this._logger.error(
                 `Failed to create ${this._table.name}`,
@@ -45,7 +46,7 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
                 .select()
                 .where(this._idField, "=", id)
                 .exec();
-            return result.length > 0 ? result[0] : null;
+            return this.getSingleResult(result);
         } catch (err) {
             this._logger.error(`Failed to find ${this._table.name}`, "find");
             this._logger.debug(`${this._idField}: ${id}`, "find");
@@ -70,17 +71,25 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
         id: Schema[PrimaryKey],
         modified: SchemaUpdate<Schema, PrimaryKey>
     ): Promise<Schema | null | undefined> {
+        return this.updateSchema(id, modified, "update");
+    }
+
+    protected async updateSchema(
+        id: Schema[PrimaryKey],
+        modified: SchemaUpdate<Schema, PrimaryKey>,
+        method: string
+    ): Promise<Schema | null | undefined> {
         const updates = getUpdates(modified);
         if (isNil(updates)) {
             this._logger.warning(
-                `Attempted to update a ${this._table.name} with no valid updates`,
-                "update"
+                `Attempted to ${method} a ${this._table.name} with no valid updates`,
+                method
             );
             this._logger.debug(
                 `${this._idField}: ${id}, modified: ${JSON.stringify(
                     modified
                 )}`,
-                "update"
+                method
             );
             return null;
         }
@@ -89,34 +98,38 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
                 .update(updates)
                 .where(this._idField, "=", id)
                 .exec();
-            const result = updated.length > 0 ? updated[0] : null;
+            const result = this.getSingleResult(updated);
             if (isNil(result)) {
                 this._logger.warning(
-                    `Attempted to update a ${this._table.name} but no updates were made`,
-                    "update"
+                    `Attempted to ${method} a ${this._table.name} but no updates were made`,
+                    method
                 );
                 this._logger.debug(
                     `${this._idField}: ${id}, modified: ${JSON.stringify(
                         modified
                     )}`,
-                    "update"
+                    method
                 );
             }
             return result;
         } catch (err) {
             this._logger.error(
-                `Failed to update ${this._table.name}`,
-                "update"
+                `Failed to ${method} ${this._table.name}`,
+                method
             );
             this._logger.debug(
                 `${this._idField}: ${id}, modified: ${JSON.stringify(
                     modified
                 )}, updates: ${JSON.stringify(updates)}`,
-                "update"
+                method
             );
-            this._logger.exception(err, "update");
+            this._logger.exception(err, method);
             return undefined;
         }
+    }
+
+    private getSingleResult(result: Schema[]): Schema | null {
+        return result.length > 0 ? result[0] : null;
     }
 }
 
