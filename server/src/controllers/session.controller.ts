@@ -2,6 +2,8 @@ import { ILogger } from "../lib/logger";
 import Session, { ISession } from "../schemas/session.schema";
 import DeactivateController from "./common/deactivate.controller";
 
+export const SESSION_LENGTH = 4; // 4 Hours
+
 class SessionController extends DeactivateController<
     ISession,
     "Session_Id",

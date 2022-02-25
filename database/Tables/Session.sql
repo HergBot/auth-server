@@ -9,3 +9,8 @@ CREATE TABLE Session
     PRIMARY KEY (Session_Id),
     FOREIGN KEY (User_Id) REFERENCES User(User_Id)
 );
+
+CREATE TRIGGER Before_Insert_Session
+    BEFORE INSERT ON Session
+    FOR EACH ROW
+    SET new.Session_Id = UUID();
