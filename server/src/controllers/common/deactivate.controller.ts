@@ -1,5 +1,4 @@
-import { isNil } from "lodash";
-import { getUpdates, SchemaUpdate, Table } from "musqrat";
+import { SchemaUpdate, Table } from "musqrat";
 
 import { ILogger } from "../../lib/logger";
 import BaseController from "./base.controller";

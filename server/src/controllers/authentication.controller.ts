@@ -14,7 +14,7 @@ class AuthenticationController {
         serviceId: number,
         username: string,
         password: string
-    ): Promise<boolean> {
+    ): Promise<IUser | null | undefined> {
         try {
             // Get the users most recent password
             const result = await Password.select<[IUser]>(
@@ -50,21 +50,22 @@ class AuthenticationController {
                 this._logger.error(
                     `Username '${username}' tried to login to Service '${serviceId}' when there are no passwords found'`
                 );
-                return false;
+                return null;
             }
             const passwordData = result[0];
-            return verifyPassword(
+            const verified = verifyPassword(
                 passwordData.Password_Hash,
                 passwordData.Salt,
                 passwordData.Version,
                 password
             );
+            return verified ? passwordData : null;
         } catch (err) {
             this._logger.exception(err);
             this._logger.error(
                 `Failed to login username: '${username}', service id: '${serviceId}'`
             );
-            return false;
+            return undefined;
         }
     }
 }

@@ -9,6 +9,8 @@ interface ISession {
     Deactivated?: Date;
 }
 
+export type INewSession = Omit<ISession, "Session_Id">;
+
 const Session = musqrat.initTable<ISession, "Session_Id">("Session");
 
 export default Session;
