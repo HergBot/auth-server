@@ -6,7 +6,7 @@ import {
     UpdateStatement,
     mockUpdate,
 } from "musqrat";
-import ServiceController from "../../src/controllers/service.controller";
+import controller from "../../src/controllers/service.controller";
 import Service, { IService } from "../../src/schemas/service.schema";
 import TestLogger from "../data/test-logger";
 import { TEST_SERVICE } from "../data/test-service";
@@ -15,12 +15,6 @@ const TEST_LOGGER = new TestLogger();
 const GENERIC_ERROR = "Generic Error";
 
 describe("[CLASS]: ServiceController", () => {
-    let controller: ServiceController;
-
-    beforeEach(() => {
-        controller = new ServiceController(TEST_LOGGER);
-    });
-
     describe("[METHOD]: constructor", () => {});
 
     describe("[METHOD]: create", () => {

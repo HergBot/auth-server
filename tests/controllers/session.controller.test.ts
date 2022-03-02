@@ -6,7 +6,7 @@ import {
     UpdateStatement,
     mockUpdate,
 } from "musqrat";
-import SessionController from "../../src/controllers/session.controller";
+import controller from "../../src/controllers/session.controller";
 import Session, { ISession } from "../../src/schemas/session.schema";
 import TestLogger from "../data/test-logger";
 import { TEST_SESSION } from "../data/test-session";
@@ -15,12 +15,6 @@ const TEST_LOGGER = new TestLogger();
 const GENERIC_ERROR = "Generic Error";
 
 describe("[CLASS]: SessionController", () => {
-    let controller: SessionController;
-
-    beforeEach(() => {
-        controller = new SessionController(TEST_LOGGER);
-    });
-
     describe("[METHOD]: constructor", () => {});
 
     describe("[METHOD]: create", () => {

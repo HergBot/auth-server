@@ -1,3 +1,4 @@
+import logger from "../lib/console-logger";
 import { ILogger } from "../lib/logger";
 import Password from "../schemas/password.schema";
 import User, { IUser } from "../schemas/user.schema";
@@ -70,4 +71,4 @@ class AuthenticationController {
     }
 }
 
-export default AuthenticationController;
+export default new AuthenticationController(logger);

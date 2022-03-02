@@ -3,17 +3,13 @@ import express from "express";
 import { isNil } from "lodash";
 import { v4 as uuidV4 } from "uuid";
 
-import AuthenticationController from "../../controllers/authentication.controller";
-import SessionController, {
+import authController from "../../controllers/authentication.controller";
+import sessionController, {
     SESSION_LENGTH,
 } from "../../controllers/session.controller";
-import { ConsoleLogger } from "../../lib/logger";
-import { INewSession, ISession } from "../../schemas/session.schema";
+import { INewSession } from "../../schemas/session.schema";
 
 const SESSION_ROUTER_ROOT = "/session";
-
-const authController = new AuthenticationController(new ConsoleLogger());
-const sessionController = new SessionController(new ConsoleLogger());
 const sessionRouter = express.Router();
 
 sessionRouter.post("/", async (req, res) => {
@@ -22,7 +18,7 @@ sessionRouter.post("/", async (req, res) => {
     const password = req.body.password;
 
     if (isNil(username) || isNil(serviceId)) {
-        return res.status(404).send();
+        return res.status(400).send();
     } else if (isNil(password)) {
         return res.status(403).send();
     }
@@ -53,8 +49,27 @@ sessionRouter.post("/", async (req, res) => {
 });
 
 sessionRouter.patch("/:sessionId", (req, res) => {
+    const sessionId = req.params.sessionId;
+    const refreshToken = req.body.refreshToken;
+    const expires = req.body.expires;
+
+    if (isNil(sessionId)) {
+        return res.status(404).send();
+    } else if (isNil(refreshToken) || isNil(expires)) {
+        return res.status(400).send();
+    }
+
+    // Make sure the session exists
+    const session = sessionController.find(sessionId);
+    if (isNil(session)) {
+        const status = session === undefined ? 500 : 400;
+        return res.status(status).send();
+    }
+
     res.send(`PATCH ${req.params.sessionId}`);
 });
+
+sessionRouter.delete("/:sessionId", (req, res) => {});
 
 export default sessionRouter;
 

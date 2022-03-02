@@ -1,3 +1,4 @@
+import logger from "../lib/console-logger";
 import { ILogger } from "../lib/logger";
 import Session, { ISession } from "../schemas/session.schema";
 import DeactivateController from "./common/deactivate.controller";
@@ -14,4 +15,4 @@ class SessionController extends DeactivateController<
     }
 }
 
-export default SessionController;
+export default new SessionController(logger);

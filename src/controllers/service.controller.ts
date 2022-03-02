@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 import { WhereAggregation, getUpdates } from "musqrat";
 
 import { MAX_DATE, MIN_DATE } from "../constants/common.constants";
+import logger from "../lib/console-logger";
 import { ILogger } from "../lib/logger";
 import Service, { IService } from "../schemas/service.schema";
 import DeactivateController from "./common/deactivate.controller";
@@ -81,4 +82,4 @@ class ServiceController extends DeactivateController<
     }*/
 }
 
-export default ServiceController;
+export default new ServiceController(logger);
