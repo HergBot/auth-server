@@ -176,6 +176,13 @@ describe("[FILE]: authentication.middleware", () => {
                         );
                     });
 
+                    test("should attach the user to the response", async () => {
+                        await callMiddleware();
+                        expect(mockResponse.locals).toEqual({
+                            user: TEST_USER,
+                        });
+                    });
+
                     test("should call the next function", async () => {
                         await callMiddleware();
                         expect(nextFunction).toBeCalled();

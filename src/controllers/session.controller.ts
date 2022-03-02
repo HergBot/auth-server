@@ -4,6 +4,7 @@ import Session, { ISession } from "../schemas/session.schema";
 import DeactivateController from "./common/deactivate.controller";
 
 export const SESSION_LENGTH = 4; // 4 Hours
+export const MAX_SESSION_LENGTH = 24; // 24 Hours
 
 class SessionController extends DeactivateController<
     ISession,

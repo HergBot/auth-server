@@ -1,4 +1,3 @@
-import { Console } from "console";
 import { NextFunction, Request, Response } from "express";
 import { isNil } from "lodash";
 
@@ -38,7 +37,7 @@ export const authenticateToken = async (
             `Session for token '${token}' has been deactivated at ${session.Deactivated}`
         );
         return res.status(401).send();
-    } else if (session.Expires < now) {
+    } else if (session.Expires.valueOf() <= now.valueOf()) {
         logger.info(
             `Session for token '${token}' expired at ${session.Expires}`
         );
