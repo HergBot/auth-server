@@ -2,13 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { isNil } from "lodash";
 
 import sessionController from "../controllers/session.controller";
+import logger from "../lib/console-logger";
 import { SessionUpdateResponse } from "../routes/v1/session.routes";
 import { parseDate } from "../utils/common.utils";
 import { validateSessionExpiry } from "../utils/session.utils";
+import { AuthenticatedResponse } from "./authentication.middleware";
 
 export const validateSessionUpdate = async (
     req: Request,
-    res: Response,
+    res: AuthenticatedResponse,
     next: NextFunction
 ): Promise<Response<any, Record<string, any>> | void> => {
     const sessionId = req.params.sessionId;
@@ -37,9 +39,17 @@ export const authorizeForSession = async (
     next: NextFunction
 ): Promise<Response<any, Record<string, any>> | void> => {
     // Make sure the session exists
-    const session = sessionController.find(res.locals.sessionId);
+    const session = await sessionController.find(res.locals.sessionId);
     if (isNil(session)) {
         const status = session === undefined ? 500 : 400;
         return res.status(status).send();
     }
+
+    if (res.locals.user.User_Id !== session.User_Id) {
+        return res.status(403).send();
+    } else if (res.locals.refreshToken !== session.Refresh_Token) {
+        return res.status(403).send();
+    }
+
+    return next();
 };

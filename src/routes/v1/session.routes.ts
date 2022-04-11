@@ -7,20 +7,24 @@ import authController from "../../controllers/authentication.controller";
 import sessionController, {
     SESSION_LENGTH,
 } from "../../controllers/session.controller";
-import { authenticateToken } from "../../middleware/authentication.middleware";
+import {
+    AuthenticatedLocals,
+    AuthenticatedResponse,
+    authenticateToken,
+} from "../../middleware/authentication.middleware";
 import { validateSessionUpdate } from "../../middleware/session.moddleware";
 import { INewSession } from "../../schemas/session.schema";
 
 const SESSION_ROUTER_ROOT = "/session";
 const sessionRouter = express.Router();
 
-export interface SessionUpdateLocals extends Record<string, any> {
+export interface SessionUpdateLocals extends AuthenticatedLocals {
     sessionId: string;
     refreshToken: string;
     expires: Date;
 }
 
-export interface SessionUpdateResponse extends Response {
+export interface SessionUpdateResponse extends AuthenticatedResponse {
     locals: SessionUpdateLocals;
 }
 
@@ -63,22 +67,6 @@ sessionRouter.post("/", async (req: Request, res: Response) => {
 sessionRouter.patch(
     "/:sessionId",
     (req: Request, res: SessionUpdateResponse) => {
-        const sessionId = req.params.sessionId;
-        const refreshToken = req.body.refreshToken;
-        const expires = req.body.expires;
-
-        if (isNil(sessionId)) {
-            return res.status(404).send();
-        } else if (isNil(refreshToken) || isNil(expires)) {
-            return res.status(400).send();
-        }
-
-        // Make sure the session exists
-        const session = sessionController.find(sessionId);
-        if (isNil(session)) {
-            const status = session === undefined ? 500 : 400;
-            return res.status(status).send();
-        }
 
         res.send(`PATCH ${req.params.sessionId}`);
     },

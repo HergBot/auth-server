@@ -4,6 +4,15 @@ import { isNil } from "lodash";
 import sessionController from "../controllers/session.controller";
 import userController from "../controllers/user.controller";
 import logger from "../lib/console-logger";
+import { IUser } from "../schemas/user.schema";
+
+export interface AuthenticatedLocals extends Record<string, any> {
+    user: IUser;
+}
+
+export interface AuthenticatedResponse extends Response {
+    locals: AuthenticatedLocals;
+}
 
 export const authenticateToken = async (
     req: Request,
