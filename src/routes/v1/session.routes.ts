@@ -14,20 +14,28 @@ import {
 } from "../../middleware/authentication.middleware";
 import {
   authorizeForSession,
+  authorizeForSessionUpdate,
   validateSessionUpdate,
 } from "../../middleware/session.moddleware";
-import { INewSession } from "../../schemas/session.schema";
+import { INewSession, ISession } from "../../schemas/session.schema";
 
 const SESSION_ROUTER_ROOT = "/session";
 const sessionRouter = express.Router();
 
-export interface SessionUpdateLocals extends AuthenticatedLocals {
-  sessionId?: string;
+export interface SessionActionLocals extends AuthenticatedLocals {
+  session?: ISession;
+}
+
+export interface SessionActionResponse extends AuthenticatedResponse {
+  locals: SessionActionLocals;
+}
+
+export interface SessionUpdateLocals extends SessionActionLocals {
   refreshToken?: string;
   expires?: Date;
 }
 
-export interface SessionUpdateResponse extends AuthenticatedResponse {
+export interface SessionUpdateResponse extends SessionActionResponse {
   locals: SessionUpdateLocals;
 }
 
@@ -73,6 +81,7 @@ sessionRouter.patch(
     if (isNil(res.locals.sessionId)) {
       return res.status(500).send();
     }
+
     const now = new Date();
     const newExpiry = addHours(now, SESSION_LENGTH);
     const session = sessionController.update(res.locals.sessionId, {
@@ -84,11 +93,52 @@ sessionRouter.patch(
 
     return res.status(200).send(session);
   },
-  [authenticateToken, validateSessionUpdate, authorizeForSession]
+  [
+    authenticateToken,
+    authorizeForSession,
+    validateSessionUpdate,
+    authorizeForSessionUpdate,
+  ]
 );
 
-sessionRouter.delete("/:sessionId", (req, res) => {});
+sessionRouter.delete(
+  "/:sessionId",
+  (req: Request, res: SessionUpdateResponse) => {
+    if (isNil(res.locals.sessionId)) {
+      return res.status(500).send();
+    }
+
+    const now = new Date();
+    const session = sessionController.update(res.locals.sessionId, {
+      Deactivated: now,
+    });
+    if (isNil(session)) {
+      return res.status(500).send();
+    }
+
+    return res.status(200).send(session);
+  },
+  [authenticateToken, authorizeForSession]
+);
 
 export default sessionRouter;
 
 export { SESSION_ROUTER_ROOT };
+
+// POST /session
+// - serviceToken
+// - username
+// - password
+// PATCH /session/:sessionId
+// - token
+// - refreshToken
+// - expires
+// DELETE /session/:sessionId
+// - token
+
+// Middleware
+// - authorizeServiceToken
+// - authorizeToken
+// - validateSessionUpdate
+// - authorizeForSession
+// - authorizeForSessionUpdate

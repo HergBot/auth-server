@@ -3,54 +3,29 @@ import { isNil } from "lodash";
 
 import sessionController from "../controllers/session.controller";
 import logger from "../lib/console-logger";
-import { SessionUpdateResponse } from "../routes/v1/session.routes";
+import {
+  SessionActionResponse,
+  SessionUpdateResponse,
+} from "../routes/v1/session.routes";
 import { parseDate } from "../utils/common.utils";
 import { validateSessionExpiry } from "../utils/session.utils";
 import { AuthenticatedResponse } from "./authentication.middleware";
 
-export const validateSessionUpdate = async (
+export const authorizeForSession = async (
   req: Request,
   res: AuthenticatedResponse,
   next: NextFunction
-): Promise<SessionUpdateResponse | void> => {
-  const sessionId = req.params.sessionId;
-  const refreshToken = req.body.refreshToken;
-  const expires = parseDate(req.body.expires);
-
-  if (isNil(sessionId)) {
-    return res.status(404).send();
-  } else if (isNil(refreshToken) || isNil(expires)) {
-    return res.status(400).send();
-  }
-
-  if (validateSessionExpiry(expires)) {
-    return res.status(400).send();
-  }
-
-  res.locals.sessionId = sessionId;
-  res.locals.refreshToken = refreshToken;
-  res.locals.expires = expires;
-  return next();
-};
-
-export const authorizeForSession = async (
-  req: Request,
-  res: SessionUpdateResponse,
-  next: NextFunction
-): Promise<Response<any, Record<string, any>> | void> => {
-  if (
-    isNil(res.locals.user) ||
-    isNil(res.locals.sessionId) ||
-    isNil(res.locals.refreshToken)
-  ) {
+): Promise<SessionActionResponse | void> => {
+  if (isNil(res.locals.user)) {
     logger.error(
-      `Authorizing for session with missing locals. user: ${res.locals.user}, sessionId: ${res.locals.sessionId}, refreshToken: ${res.locals.refreshToken}`
+      `Authorizing for session with missing locals. user: ${res.locals.user}`
     );
     return res.status(500).send();
   }
 
+  const sessionId = req.params.sessionId;
   // Make sure the session exists
-  const session = await sessionController.find(res.locals.sessionId);
+  const session = await sessionController.find(sessionId);
   if (isNil(session)) {
     const status = session === undefined ? 500 : 404;
     return res.status(status).send();
@@ -61,7 +36,56 @@ export const authorizeForSession = async (
       `User ${res.locals.user.User_Id} tried to update a session that isn't theirs: ${res.locals.sessionId}`
     );
     return res.status(403).send();
-  } else if (res.locals.refreshToken !== session.Refresh_Token) {
+  }
+
+  res.locals.session = session;
+  return next();
+};
+
+export const validateSessionUpdate = async (
+  req: Request,
+  res: SessionActionResponse,
+  next: NextFunction
+): Promise<SessionUpdateResponse | void> => {
+  if (isNil(res.locals.session)) {
+    logger.error(
+      `Validating for session update  with missing locals. sessionId: ${res.locals.sessionId}`
+    );
+    return res.status(500).send();
+  }
+  const refreshToken = req.body.refreshToken;
+  const expires = parseDate(req.body.expires);
+
+  if (isNil(refreshToken) || isNil(expires)) {
+    return res.status(400).send();
+  }
+
+  if (validateSessionExpiry(expires)) {
+    return res.status(400).send();
+  }
+
+  res.locals.refreshToken = refreshToken;
+  res.locals.expires = expires;
+  return next();
+};
+
+export const authorizeForSessionUpdate = async (
+  req: Request,
+  res: SessionUpdateResponse,
+  next: NextFunction
+): Promise<SessionUpdateResponse | void> => {
+  if (
+    isNil(res.locals.user) ||
+    isNil(res.locals.session) ||
+    isNil(res.locals.refreshToken)
+  ) {
+    logger.error(
+      `Authorizing for session with missing locals. user: ${res.locals.user}, sessionId: ${res.locals.sessionId}, refreshToken: ${res.locals.refreshToken}`
+    );
+    return res.status(500).send();
+  }
+
+  if (res.locals.refreshToken !== res.locals.session.Refresh_Token) {
     logger.warning(
       `User ${res.locals.user.User_Id} tried to update a session with the wrong refresh token: ${res.locals.refreshToken}`
     );
