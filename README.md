@@ -21,7 +21,58 @@ Starting Flow:
 - Other service uses token to create new sessions
 - Users of other service can use session token to modify sessions
 
-Service Routes: - GET service - HBAS session token (HBAS admin role) - GET /service/:serviceId - HBAS session token (HBAS admin role) - POST service - HBAS session token (HBAS admin role) - PATCH service/:serviceId - HBAS session token (HBAS admin role) - DELETE service/:serviceId - HBAS session token (HBAS admin role)
-User Routes: - GET /user - Session token - Service Id? - hbas-admin-request header? - GET /user/:userId - Session token - Service Id? - hbas-admin-request header? - POST /user - Service token - Service Id
-OR - Session token - Service Id - hbas-admin-request header? - PATCH /user/:userId - Session token - Service Id - hbas-admin-request header? - DELETE /user/:userId - Session token - Service Id - hbas-admin-request header?
-Session Routes: - GET /session - HBAS session token (HBAS admin role) - POST /session - Service token - Service Id - PATCH /session - Session token - Service Id - hbas-admin-request header? - DELETE /session - Session token - Service Id - hbas-admin-request header?
+Service Routes:
+
+- GET service
+  - HBAS session token (HBAS admin role)
+- GET /service/:serviceId
+  - HBAS session token (HBAS admin role)
+- POST service
+  - HBAS session token (HBAS admin role)
+- PATCH service/:serviceId
+  - HBAS session token (HBAS admin role)
+- DELETE service/:serviceId
+
+  - HBAS session token (HBAS admin role)
+
+  User Routes:
+
+  - GET /user
+    - Session token
+    - Service Id?
+    - hbas-admin-request header?
+  - GET /user/:userId
+    - Session token
+    - Service Id?
+    - hbas-admin-request header?
+  - POST /user
+    - Service token
+    - Service Id
+      OR
+    - Session token
+    - Service Id
+    - hbas-admin-request header?
+  - PATCH /user/:userId
+    - Session token
+    - Service Id
+    - hbas-admin-request header?
+  - DELETE /user/:userId
+    - Session token
+    - Service Id
+    - hbas-admin-request header?
+
+  Session Routes:
+
+  - GET /session
+    - HBAS session token (HBAS admin role)
+  - POST /session
+    - Service token
+    - Service Id
+  - PATCH /session
+    - Session token
+    - Service Id
+    - hbas-admin-request header?
+  - DELETE /session
+    - Session token
+    - Service Id
+    - hbas-admin-request header?

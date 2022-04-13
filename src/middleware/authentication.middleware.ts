@@ -72,3 +72,42 @@ export const authenticateToken = async (
   res.locals.user = user;
   return next();
 };
+
+export const authenticateHergBotAdminToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<AuthenticatedResponse | void> => {
+  // Check if the user locals value exists
+  // Check if the user belongs to the Herg Bot Auth Service
+  // Check if the user has an admin role
+};
+
+export const authenticateServiceId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  // Check if the service id header exists
+  // Check if the service exists
+  // Attach service to locals
+};
+
+export const authenticateServiceToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  // Check if the service locals value exists
+  // Check if the service token header exists
+  // Check if the given token matches the service in locals
+};
+
+export const authenticateUserForService = async (
+  req: Request,
+  res: AuthenticatedResponse,
+  next: NextFunction
+): Promise<AuthenticatedResponse | void> => {
+  // Check if the user and service locals value exists
+  // Check if the user service matches the service's id
+};
