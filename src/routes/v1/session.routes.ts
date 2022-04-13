@@ -16,7 +16,7 @@ import {
   authorizeForSession,
   authorizeForSessionUpdate,
   validateSessionUpdate,
-} from "../../middleware/session.moddleware";
+} from "../../middleware/session.middleware";
 import { INewSession, ISession } from "../../schemas/session.schema";
 
 const SESSION_ROUTER_ROOT = "/session";

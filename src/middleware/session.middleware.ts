@@ -56,11 +56,11 @@ export const validateSessionUpdate = async (
   const refreshToken = req.body.refreshToken;
   const expires = parseDate(req.body.expires);
 
-  if (isNil(refreshToken) || isNil(expires)) {
+  if (isNil(refreshToken)) {
     return res.status(400).send();
   }
 
-  if (validateSessionExpiry(expires)) {
+  if (!isNil(expires) && !validateSessionExpiry(expires)) {
     return res.status(400).send();
   }
 
@@ -80,7 +80,7 @@ export const authorizeForSessionUpdate = async (
     isNil(res.locals.refreshToken)
   ) {
     logger.error(
-      `Authorizing for session with missing locals. user: ${res.locals.user}, sessionId: ${res.locals.sessionId}, refreshToken: ${res.locals.refreshToken}`
+      `Authorizing for session with missing locals. user: ${res.locals.user}, session: ${res.locals.session}, refreshToken: ${res.locals.refreshToken}`
     );
     return res.status(500).send();
   }
