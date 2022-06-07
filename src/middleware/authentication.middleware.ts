@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { isNil } from "lodash";
+import {
+  HERGBOT_AUTH_SERVICE_ADMIN_ROLE_ID,
+  HERGBOT_AUTH_SERVICE_ID,
+} from "../constants/environment.constants";
 
 import sessionController from "../controllers/session.controller";
+import userRoleController from "../controllers/user-role.controller";
 import userController from "../controllers/user.controller";
 import logger from "../lib/console-logger";
 import { IUser } from "../schemas/user.schema";
@@ -75,12 +80,43 @@ export const authenticateToken = async (
 
 export const authenticateHergBotAdminToken = async (
   req: Request,
-  res: Response,
+  res: AuthenticatedResponse,
   next: NextFunction
 ): Promise<AuthenticatedResponse | void> => {
   // Check if the user locals value exists
+  if (isNil(res.locals.user)) {
+    logger.warning(`Admin end point '${req.path}' was hit without user data`);
+    return res.status(500).send();
+  }
+
   // Check if the user belongs to the Herg Bot Auth Service
+  if (res.locals.user.Service_Id !== HERGBOT_AUTH_SERVICE_ID) {
+    logger.warning(
+      `Admin end point '${req.path}' was hit by non-admin user '${res.locals.user.User_Id}'`
+    );
+    return res.status(403).send();
+  }
+
   // Check if the user has an admin role
+  const userRole = await userRoleController.find(
+    res.locals.user.User_Id,
+    HERGBOT_AUTH_SERVICE_ADMIN_ROLE_ID
+  );
+  if (isNil(userRole)) {
+    if (userRole === undefined) {
+      logger.error(
+        `Error finding the HergBot Admin Service Admin Role with user id ${res.locals.user.User_Id}`
+      );
+      return res.status(500).send();
+    }
+    logger.warning(
+      `Admin end point '${req.path}' was hit by admin user '${res.locals.user.User_Id}' but lacked admin role`
+    );
+    return res.status(403).send();
+  }
+
+  // User must have the admin role
+  return next();
 };
 
 export const authenticateServiceId = async (
