@@ -1,13 +1,23 @@
 import { NextFunction, Request, Response } from "express";
+import { HEADERS } from "../../src/constants/request.constants";
+import serviceTokenController from "../../src/controllers/service-token.controller";
+import serviceController from "../../src/controllers/service.controller";
 
 import sessionController from "../../src/controllers/session.controller";
 import userRoleController from "../../src/controllers/user-role.controller";
 import userController from "../../src/controllers/user.controller";
 import {
   authenticateHergBotAdminToken,
+  authenticateServiceToken,
   authenticateToken,
 } from "../../src/middleware/authentication.middleware";
 import { TEST_AUTHORIZATION_TOKEN } from "../data/test-data";
+import { DEACTIVATED_SERVICE, TEST_SERVICE } from "../data/test-service";
+import {
+  DEACTIVATED_SERVICE_TOKEN,
+  EXPIRED_SERVICE_TOKEN,
+  TEST_SERVICE_TOKEN,
+} from "../data/test-service-token";
 import {
   DEACTIVATED_SESSION,
   EXPIRED_SESSION,
@@ -218,13 +228,6 @@ describe("[FILE]: authentication.middleware", () => {
       nextFunction = jest.fn();
     });
 
-    // Tests:
-    // - When no user value exists on locals -> 500 (unexpected behaviour)
-    // - When the user is not registered to the Herg Bot Auth Service -> 403
-    // - When there is an error getting the user role -> 500
-    // - When the user does not have an admin role for the Herg Bot Auth Service -> 403
-    // - When all conditions are met -> call next
-
     describe("when no user value exists on locals", () => {
       test("should return a 500", async () => {
         await callMiddleware();
@@ -284,6 +287,176 @@ describe("[FILE]: authentication.middleware", () => {
               User_Id: HERGBOT_AUTH_ADMIN_USER.User_Id,
               Role_Id: HERGBOT_AUTH_ADMIN_USER.Service_Id,
             });
+          });
+
+          test("should call the next function", async () => {
+            await callMiddleware();
+            expect(nextFunction).toBeCalled();
+          });
+        });
+      });
+    });
+  });
+
+  describe("[FUNCTION]: authenticateServiceToken", () => {
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<Response> & { locals: Record<string, any> };
+    let nextFunction: NextFunction;
+    let status: Number;
+
+    const callMiddleware = async (): Promise<void> => {
+      await authenticateServiceToken(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction
+      );
+    };
+
+    beforeEach(() => {
+      mockRequest = {
+        path: "/authentication-middleware/test",
+        get: jest.fn(),
+      };
+      mockResponse = {
+        status: (code: Number): Response => {
+          status = code;
+          return mockResponse as Response;
+        },
+        locals: {},
+        send: jest.fn(),
+      };
+      nextFunction = jest.fn();
+    });
+
+    describe("when there are no headers", () => {
+      test("should return 403", async () => {
+        await callMiddleware();
+        expect(status).toEqual(403);
+      });
+    });
+
+    describe("when there is no service token header", () => {
+      beforeEach(() => {
+        mockRequest.headers = {
+          randomHeader: "some header",
+        };
+      });
+
+      test("should return 403", async () => {
+        await callMiddleware();
+        expect(status).toEqual(403);
+      });
+    });
+
+    describe("when there is a valid service token header", () => {
+      beforeEach(() => {
+        mockRequest.headers = {
+          [HEADERS.HERGBOT_SERVICE_TOKEN]: "service_token",
+        };
+      });
+
+      describe("when there is an error finding the service token", () => {
+        beforeEach(() => {
+          jest
+            .spyOn(serviceTokenController, "find")
+            .mockResolvedValue(undefined);
+        });
+
+        test("should return 500", async () => {
+          await callMiddleware();
+          expect(status).toEqual(500);
+        });
+      });
+
+      describe("when the service token is not found", () => {
+        beforeEach(() => {
+          jest.spyOn(serviceTokenController, "find").mockResolvedValue(null);
+        });
+
+        test("should return 403", async () => {
+          await callMiddleware();
+          expect(status).toEqual(403);
+        });
+      });
+
+      describe("when the service token is deactivated", () => {
+        beforeEach(() => {
+          jest
+            .spyOn(serviceTokenController, "find")
+            .mockResolvedValue(DEACTIVATED_SERVICE_TOKEN);
+        });
+
+        test("should return 403", async () => {
+          await callMiddleware();
+          expect(status).toEqual(403);
+        });
+      });
+
+      describe("when the service token is expired", () => {
+        beforeEach(() => {
+          jest
+            .spyOn(serviceTokenController, "find")
+            .mockResolvedValue(EXPIRED_SERVICE_TOKEN);
+        });
+
+        test("should return 401", async () => {
+          await callMiddleware();
+          expect(status).toEqual(401);
+        });
+      });
+
+      describe("when the service token is valid", () => {
+        beforeEach(() => {
+          jest
+            .spyOn(serviceTokenController, "find")
+            .mockResolvedValue(TEST_SERVICE_TOKEN);
+        });
+
+        describe("when there is an error getting the service", () => {
+          beforeEach(() => {
+            jest.spyOn(serviceController, "find").mockResolvedValue(undefined);
+          });
+
+          test("should return 500", async () => {
+            await callMiddleware();
+            expect(status).toEqual(500);
+          });
+        });
+
+        describe("when no service is found", () => {
+          beforeEach(() => {
+            jest.spyOn(serviceController, "find").mockResolvedValue(null);
+          });
+
+          test("should return 403", async () => {
+            await callMiddleware();
+            expect(status).toEqual(403);
+          });
+        });
+
+        describe("when the service is deactivated", () => {
+          beforeEach(() => {
+            jest
+              .spyOn(serviceController, "find")
+              .mockResolvedValue(DEACTIVATED_SERVICE);
+          });
+
+          test("should return 403", async () => {
+            await callMiddleware();
+            expect(status).toEqual(403);
+          });
+        });
+
+        describe("when the service is valid", () => {
+          beforeEach(() => {
+            jest
+              .spyOn(serviceController, "find")
+              .mockResolvedValue(TEST_SERVICE);
+          });
+
+          test("should attach the service to locals", async () => {
+            await callMiddleware();
+            expect(mockResponse.locals.service).toBeDefined();
           });
 
           test("should call the next function", async () => {

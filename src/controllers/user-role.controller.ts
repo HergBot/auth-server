@@ -1,6 +1,6 @@
 import logger from "../lib/console-logger";
 import { ILogger } from "../lib/logger";
-import UserRole, { IUserRole } from "../schemas/user-role.scheme";
+import UserRole, { IUserRole } from "../schemas/user-role.schema";
 import DualKeyController from "./common/dual-key.controller";
 
 class UserRoleController extends DualKeyController<

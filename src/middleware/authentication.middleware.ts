@@ -4,12 +4,16 @@ import {
   HERGBOT_AUTH_SERVICE_ADMIN_ROLE_ID,
   HERGBOT_AUTH_SERVICE_ID,
 } from "../constants/environment.constants";
+import { HEADERS } from "../constants/request.constants";
+import serviceTokenController from "../controllers/service-token.controller";
+import serviceController from "../controllers/service.controller";
 
 import sessionController from "../controllers/session.controller";
 import userRoleController from "../controllers/user-role.controller";
 import userController from "../controllers/user.controller";
 import logger from "../lib/console-logger";
 import { IUser } from "../schemas/user.schema";
+import { anyHeaders, hasHeader } from "../utils/middleware.utils";
 
 export interface AuthenticatedLocals extends Record<string, any> {
   user?: IUser;
@@ -18,6 +22,27 @@ export interface AuthenticatedLocals extends Record<string, any> {
 export interface AuthenticatedResponse extends Response {
   locals: AuthenticatedLocals;
 }
+
+export const getUserTokenData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // Check if authorization header exists
+  if (!anyHeaders(req)) {
+    logger.info(`'${req.path}' was hit without any headers`);
+    return res.status(403).send();
+  } else if (!hasHeader(req, HEADERS.AUTHORIZATION)) {
+    logger.info(`'${req.path}' was hit without an authorization header`);
+    return res.status(403).send();
+  }
+
+  // Query for session, user, and service
+  const token = req.get(HEADERS.AUTHORIZATION) || "";
+  // TODO: Make a way to query session, user, and service info in one call. Do the same for a getServiceTokenData function
+  // so we can take all queries out of middleware where possible.
+  // Check if the user is with the Herg Bot Auth Service and is an admin
+};
 
 export const authenticateToken = async (
   req: Request,
@@ -59,6 +84,7 @@ export const authenticateToken = async (
   // Find user attached to session
   const user = await userController.find(session.User_Id);
   if (isNil(user)) {
+    // TODO: Change this to return 500 for either undefined or null, just log different error messages (the user should not be missing ever because it is tied to the session).
     if (user === undefined) {
       logger.error(
         `Error finding the user with id ${session.User_Id} for token ${token}`
@@ -119,24 +145,73 @@ export const authenticateHergBotAdminToken = async (
   return next();
 };
 
-export const authenticateServiceId = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  // Check if the service id header exists
-  // Check if the service exists
-  // Attach service to locals
-};
-
 export const authenticateServiceToken = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  // Check if the service locals value exists
   // Check if the service token header exists
-  // Check if the given token matches the service in locals
+  if (!anyHeaders(req)) {
+    logger.info(`'${req.path}' was hit without any headers`);
+    return res.status(403).send();
+  } else if (!hasHeader(req, HEADERS.HERGBOT_SERVICE_TOKEN)) {
+    logger.info(`'${req.path}' was hit without a service token`);
+    return res.status(403).send();
+  }
+
+  // Check if the service token exists
+  const now = new Date();
+  const serviceTokenHeader = req.get(HEADERS.HERGBOT_SERVICE_TOKEN) || "";
+  const serviceToken = await serviceTokenController.find(serviceTokenHeader);
+  if (isNil(serviceToken)) {
+    if (serviceToken === undefined) {
+      logger.error(
+        `Error finding the service token with id ${serviceToken} for endpoint '${req.path}'`
+      );
+      return res.status(500).send();
+    }
+    logger.warning(
+      `No service token with id ${serviceToken} for endpoint '${req.path}'`
+    );
+    return res.status(403).send();
+  } else if (!isNil(serviceToken.Deactivated)) {
+    logger.info(
+      `Service token with id ${serviceToken} has been deactivated at ${serviceToken.Deactivated} (endpoint '${req.path}')`
+    );
+    return res.status(403).send();
+  } else if (
+    !isNil(serviceToken.Expires) &&
+    serviceToken.Expires.valueOf() <= now.valueOf()
+  ) {
+    logger.info(
+      `Service token '${serviceToken}' expired at ${serviceToken.Expires}`
+    );
+    return res.status(401).send();
+  }
+
+  // Get the service
+  const service = await serviceController.find(serviceToken.Service_Id);
+  if (isNil(service)) {
+    if (service === undefined) {
+      logger.error(
+        `Error finding the service with id ${serviceToken.Service_Id} with service token ${serviceToken.Service_Token_Id} for endpoint '${req.path}'`
+      );
+      return res.status(500).send();
+    }
+    logger.warning(
+      `No service with id ${serviceToken.Service_Id} with service token ${serviceToken.Service_Token_Id} for endpoint '${req.path}'`
+    );
+    return res.status(403).send();
+  } else if (!isNil(service.Deactivated)) {
+    logger.info(
+      `Service with id ${serviceToken.Service_Id} with service token ${serviceToken.Service_Token_Id} has been deactivated at ${service.Deactivated} (endpoint '${req.path}')`
+    );
+    return res.status(403).send();
+  }
+
+  // Attach service to locals
+  res.locals.service = service;
+  next();
 };
 
 export const authenticateUserForService = async (

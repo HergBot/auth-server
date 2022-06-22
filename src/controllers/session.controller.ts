@@ -7,13 +7,13 @@ export const SESSION_LENGTH = 4; // 4 Hours
 export const MAX_SESSION_LENGTH = 24; // 24 Hours
 
 class SessionController extends DeactivateController<
-    ISession,
-    "Session_Id",
-    "Deactivated"
+  ISession,
+  "Session_Id",
+  "Deactivated"
 > {
-    constructor(logger: ILogger) {
-        super(logger, Session, "Session_Id", "Deactivated");
-    }
+  constructor(logger: ILogger) {
+    super(logger, Session, "Session_Id", "Deactivated");
+  }
 }
 
 export default new SessionController(logger);
