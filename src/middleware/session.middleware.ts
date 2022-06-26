@@ -9,11 +9,11 @@ import {
 } from "../routes/v1/session.routes";
 import { parseDate } from "../utils/common.utils";
 import { validateSessionExpiry } from "../utils/session.utils";
-import { AuthenticatedResponse } from "./authentication.middleware";
+import { UserAuthenticatedResponse } from "./authentication.middleware";
 
 export const authorizeForSession = async (
   req: Request,
-  res: AuthenticatedResponse,
+  res: UserAuthenticatedResponse,
   next: NextFunction
 ): Promise<SessionActionResponse | void> => {
   if (isNil(res.locals.user)) {

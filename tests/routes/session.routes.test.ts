@@ -26,6 +26,9 @@ jest.mock("../../src/middleware/authentication.middleware", () => ({
   authenticateServiceToken: jest.fn((req, res, next) => {
     next();
   }),
+  authenticateServiceForService: jest.fn((req, res, next) => {
+    next();
+  }),
 }));
 
 describe("[FILE]: session.routes", () => {

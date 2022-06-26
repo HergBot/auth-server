@@ -8,8 +8,10 @@ import userRoleController from "../../src/controllers/user-role.controller";
 import userController from "../../src/controllers/user.controller";
 import {
   authenticateHergBotAdminToken,
+  authenticateServiceForService,
   authenticateServiceToken,
   authenticateToken,
+  ServiceAuthenticatedResponse,
 } from "../../src/middleware/authentication.middleware";
 import { TEST_AUTHORIZATION_TOKEN } from "../data/test-data";
 import { DEACTIVATED_SERVICE, TEST_SERVICE } from "../data/test-service";
@@ -463,6 +465,82 @@ describe("[FILE]: authentication.middleware", () => {
             await callMiddleware();
             expect(nextFunction).toBeCalled();
           });
+        });
+      });
+    });
+  });
+
+  describe("[FUNCTION]: authenticateServiceForService", () => {
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<ServiceAuthenticatedResponse>;
+    let nextFunction: NextFunction;
+    let status: Number;
+
+    const callMiddleware = async (): Promise<void> => {
+      await authenticateServiceForService(
+        mockRequest as Request,
+        mockResponse as ServiceAuthenticatedResponse,
+        nextFunction
+      );
+    };
+
+    beforeEach(() => {
+      mockRequest = {
+        path: "/authentication-middleware/test",
+      };
+      mockResponse = {
+        status: (code: Number): ServiceAuthenticatedResponse => {
+          status = code;
+          return mockResponse as ServiceAuthenticatedResponse;
+        },
+        locals: {},
+        send: jest.fn(),
+      };
+      nextFunction = jest.fn();
+    });
+
+    describe("when a service is not included in locals", () => {
+      test("should return 403", async () => {
+        await callMiddleware();
+        expect(status).toEqual(403);
+      });
+    });
+
+    describe("when a service is included in locals", () => {
+      beforeEach(() => {
+        mockResponse.locals = { service: TEST_SERVICE };
+      });
+
+      describe("when a service id is not included in the body", () => {
+        beforeEach(() => {
+          mockRequest.body = {};
+        });
+
+        test("should return 403", async () => {
+          await callMiddleware();
+          expect(status).toEqual(403);
+        });
+      });
+
+      describe("when the service id does not match the service id of the service token", () => {
+        beforeEach(() => {
+          mockRequest.body = { serviceId: "wrongid" };
+        });
+
+        test("should return 403", async () => {
+          await callMiddleware();
+          expect(status).toEqual(403);
+        });
+      });
+
+      describe("when the service id matches the service id of the token", () => {
+        beforeEach(() => {
+          mockRequest.body = { serviceId: TEST_SERVICE.Service_Id };
+        });
+
+        test("should call the next function", async () => {
+          await callMiddleware();
+          expect(nextFunction).toBeCalled();
         });
       });
     });

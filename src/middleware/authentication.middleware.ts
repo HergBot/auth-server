@@ -12,15 +12,24 @@ import sessionController from "../controllers/session.controller";
 import userRoleController from "../controllers/user-role.controller";
 import userController from "../controllers/user.controller";
 import logger from "../lib/console-logger";
+import { IService } from "../schemas/service.schema";
 import { IUser } from "../schemas/user.schema";
 import { anyHeaders, hasHeader } from "../utils/middleware.utils";
 
-export interface AuthenticatedLocals extends Record<string, any> {
+export interface ServiceAuthenticatedLocals extends Record<string, any> {
+  service?: IService;
+}
+
+export interface ServiceAuthenticatedResponse extends Response {
+  locals: ServiceAuthenticatedLocals;
+}
+
+export interface UserAuthenticatedLocals extends Record<string, any> {
   user?: IUser;
 }
 
-export interface AuthenticatedResponse extends Response {
-  locals: AuthenticatedLocals;
+export interface UserAuthenticatedResponse extends Response {
+  locals: UserAuthenticatedLocals;
 }
 
 export const getUserTokenData = async (
@@ -48,7 +57,7 @@ export const authenticateToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<AuthenticatedResponse | void> => {
+): Promise<UserAuthenticatedResponse | void> => {
   if (isNil(req.headers)) {
     logger.info(`'${req.path}' was hit without any headers`);
     return res.status(403).send();
@@ -106,9 +115,9 @@ export const authenticateToken = async (
 
 export const authenticateHergBotAdminToken = async (
   req: Request,
-  res: AuthenticatedResponse,
+  res: UserAuthenticatedResponse,
   next: NextFunction
-): Promise<AuthenticatedResponse | void> => {
+): Promise<UserAuthenticatedResponse | void> => {
   // Check if the user locals value exists
   if (isNil(res.locals.user)) {
     logger.warning(`Admin end point '${req.path}' was hit without user data`);
@@ -149,7 +158,7 @@ export const authenticateServiceToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<Response | void> => {
+): Promise<ServiceAuthenticatedResponse | void> => {
   // Check if the service token header exists
   if (!anyHeaders(req)) {
     logger.info(`'${req.path}' was hit without any headers`);
@@ -211,14 +220,39 @@ export const authenticateServiceToken = async (
 
   // Attach service to locals
   res.locals.service = service;
-  next();
+  return next();
+};
+
+export const authenticateServiceForService = async (
+  req: Request,
+  res: ServiceAuthenticatedResponse,
+  next: NextFunction
+): Promise<ServiceAuthenticatedResponse | void> => {
+  const requestingServiceId = res.locals.service?.Service_Id;
+  const targetServiceId = req.body?.serviceId;
+  if (isNil(requestingServiceId)) {
+    logger.info(`'${req.path}' was hit without a requesting service id`);
+    return res.status(403).send();
+  } else if (isNil(targetServiceId)) {
+    logger.info(`'${req.path}' was hit without a target service id`);
+    return res.status(403).send();
+  }
+
+  if (requestingServiceId !== targetServiceId) {
+    logger.warning(
+      `'${req.path}' was hit by service id '${requestingServiceId}' targeting service id '${targetServiceId}'`
+    );
+    return res.status(403).send();
+  }
+
+  return next();
 };
 
 export const authenticateUserForService = async (
   req: Request,
-  res: AuthenticatedResponse,
+  res: UserAuthenticatedResponse,
   next: NextFunction
-): Promise<AuthenticatedResponse | void> => {
+): Promise<UserAuthenticatedResponse | void> => {
   // Check if the user and service locals value exists
   // Check if the user service matches the service's id
 };

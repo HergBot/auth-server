@@ -5,7 +5,7 @@ import sessionController, {
   MAX_SESSION_LENGTH,
 } from "../../src/controllers/session.controller";
 import userController from "../../src/controllers/user.controller";
-import { AuthenticatedResponse } from "../../src/middleware/authentication.middleware";
+import { UserAuthenticatedResponse } from "../../src/middleware/authentication.middleware";
 import {
   authorizeForSession,
   authorizeForSessionUpdate,
@@ -26,14 +26,14 @@ import { DEACTIVATED_USER, TEST_USER } from "../data/test-user";
 describe("[FILE]: session.middleware", () => {
   describe("[FUNCTION]: authorizeForSession", () => {
     let mockRequest: Partial<Request>;
-    let mockResponse: Partial<AuthenticatedResponse>;
+    let mockResponse: Partial<UserAuthenticatedResponse>;
     let nextFunction: NextFunction;
     let status: Number;
 
     const callMiddleware = async (): Promise<void> => {
       await authorizeForSession(
         mockRequest as Request,
-        mockResponse as AuthenticatedResponse,
+        mockResponse as UserAuthenticatedResponse,
         nextFunction
       );
     };

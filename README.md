@@ -76,3 +76,16 @@ Service Routes:
     - Session token
     - Service Id
     - hbas-admin-request header?
+
+### Common Errors
+
+`Route.<method>() requires a callback function but got a [object Undefined]` when running tests
+Fix: You probably forgot to mock a middleware
+
+```
+jest.mock("<middleware file>", () => ({
+  middlewareMethodName: jest.fn((req, res, next) => {
+    next();
+  })
+}));
+```

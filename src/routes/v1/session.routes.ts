@@ -10,10 +10,11 @@ import sessionController, {
 } from "../../controllers/session.controller";
 import logger from "../../lib/console-logger";
 import {
-  AuthenticatedLocals,
-  AuthenticatedResponse,
+  UserAuthenticatedLocals,
+  UserAuthenticatedResponse,
   authenticateServiceToken,
   authenticateToken,
+  authenticateServiceForService,
 } from "../../middleware/authentication.middleware";
 import {
   authorizeForSession,
@@ -25,11 +26,11 @@ import { INewSession, ISession } from "../../schemas/session.schema";
 const SESSION_ROUTER_ROOT = "/session";
 const sessionRouter = express.Router();
 
-export interface SessionActionLocals extends AuthenticatedLocals {
+export interface SessionActionLocals extends UserAuthenticatedLocals {
   session?: ISession;
 }
 
-export interface SessionActionResponse extends AuthenticatedResponse {
+export interface SessionActionResponse extends UserAuthenticatedResponse {
   locals: SessionActionLocals;
 }
 
@@ -45,6 +46,7 @@ export interface SessionUpdateResponse extends SessionActionResponse {
 sessionRouter.post(
   "/",
   authenticateServiceToken,
+  authenticateServiceForService,
   async (req: Request, res: Response) => {
     const serviceId = req.body.serviceId;
     const username = req.body.username;
