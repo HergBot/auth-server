@@ -1,4 +1,3 @@
-import express, { NextFunction, Request, Response } from "express";
 import request from "supertest";
 
 import authenticationController from "../../src/controllers/authentication.controller";
@@ -6,15 +5,11 @@ import sessionController from "../../src/controllers/session.controller";
 import sessionRoutes, {
   SESSION_ROUTER_ROOT,
 } from "../../src/routes/v1/session.routes";
+import testApp from "../data/test-app";
 import { TEST_SESSION } from "../data/test-session";
 import { TEST_USER } from "../data/test-user";
 
-const testApp = express();
-testApp.use(express.json());
 testApp.use(SESSION_ROUTER_ROOT, sessionRoutes);
-testApp.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  return res.status(500).send("Internal Server Error");
-});
 
 jest.mock("../../src/middleware/authentication.middleware", () => ({
   authenticateToken: jest.fn((req, res, next) => {

@@ -1,5 +1,4 @@
 import { addHours } from "date-fns";
-import { el } from "date-fns/locale";
 import express, { Request, Response } from "express";
 import { isNil } from "lodash";
 import { v4 as uuidV4 } from "uuid";
@@ -96,7 +95,7 @@ sessionRouter.post(
         );
       } else {
         logger.warning(
-          `Did not make session for username '${username}' (service id '${serviceId}')`
+          `Failed to make session for username '${username}' (service id '${serviceId}')`
         );
       }
       return res.status(500).send();
