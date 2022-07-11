@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HEADERS } from "../../src/constants/request.constants";
+import { HEADERS, STATUSES } from "../../src/constants/request.constants";
 import serviceTokenController from "../../src/controllers/service-token.controller";
 import serviceController from "../../src/controllers/service.controller";
 
@@ -9,6 +9,7 @@ import userController from "../../src/controllers/user.controller";
 import {
   authenticateHergBotAdminToken,
   authenticateServiceForService,
+  authenticateServiceForUser,
   authenticateServiceToken,
   authenticateToken,
   ServiceAuthenticatedResponse,
@@ -536,6 +537,86 @@ describe("[FILE]: authentication.middleware", () => {
       describe("when the service id matches the service id of the token", () => {
         beforeEach(() => {
           mockRequest.body = { serviceId: TEST_SERVICE.Service_Id };
+        });
+
+        test("should call the next function", async () => {
+          await callMiddleware();
+          expect(nextFunction).toBeCalled();
+        });
+      });
+    });
+  });
+
+  describe("[FUNCTION]: authenticateServiceForUser", () => {
+    let mockRequest: Partial<Request>;
+    let mockResponse: Partial<ServiceAuthenticatedResponse>;
+    let nextFunction: NextFunction;
+    let status: Number;
+
+    const callMiddleware = async (): Promise<void> => {
+      await authenticateServiceForUser(
+        mockRequest as Request,
+        mockResponse as ServiceAuthenticatedResponse,
+        nextFunction
+      );
+    };
+
+    beforeEach(() => {
+      mockRequest = {
+        path: "/authentication-middleware/test",
+      };
+      mockResponse = {
+        status: (code: Number): ServiceAuthenticatedResponse => {
+          status = code;
+          return mockResponse as ServiceAuthenticatedResponse;
+        },
+        locals: {},
+        send: jest.fn(),
+      };
+      nextFunction = jest.fn();
+    });
+
+    describe("when a service is not included in locals", () => {
+      test(`should return ${STATUSES.FORBIDDEN}`, async () => {
+        await callMiddleware();
+        expect(status).toEqual(STATUSES.FORBIDDEN);
+      });
+    });
+
+    describe("when a service is included in locals", () => {
+      beforeEach(() => {
+        mockResponse.locals = { service: TEST_SERVICE };
+      });
+
+      describe("when a user is not included in locals", () => {
+        test(`should return ${STATUSES.FORBIDDEN}`, async () => {
+          await callMiddleware();
+          expect(status).toEqual(STATUSES.FORBIDDEN);
+        });
+      });
+    });
+
+    describe("when a service and user is included in locals", () => {
+      describe("when the user does not belong to the service", () => {
+        beforeEach(() => {
+          mockResponse.locals = {
+            service: TEST_SERVICE,
+            user: { ...TEST_USER, service: -300 },
+          };
+        });
+
+        test(`should return ${STATUSES.FORBIDDEN}`, async () => {
+          await callMiddleware();
+          expect(status).toEqual(STATUSES.FORBIDDEN);
+        });
+      });
+
+      describe("when the user belongs to the service", () => {
+        beforeEach(() => {
+          mockResponse.locals = {
+            service: TEST_SERVICE,
+            user: { ...TEST_USER, service: TEST_SERVICE.Service_Id },
+          };
         });
 
         test("should call the next function", async () => {

@@ -4,7 +4,7 @@ import {
   HERGBOT_AUTH_SERVICE_ADMIN_ROLE_ID,
   HERGBOT_AUTH_SERVICE_ID,
 } from "../constants/environment.constants";
-import { HEADERS } from "../constants/request.constants";
+import { HEADERS, STATUSES } from "../constants/request.constants";
 import serviceTokenController from "../controllers/service-token.controller";
 import serviceController from "../controllers/service.controller";
 
@@ -243,6 +243,33 @@ export const authenticateServiceForService = async (
       `'${req.path}' was hit by service id '${requestingServiceId}' targeting service id '${targetServiceId}'`
     );
     return res.status(403).send();
+  }
+
+  return next();
+};
+
+export const authenticateServiceForUser = async (
+  req: Request,
+  res: ServiceAuthenticatedResponse & UserAuthenticatedResponse,
+  next: NextFunction
+): Promise<ServiceAuthenticatedResponse | void> => {
+  const requestingServiceId = res.locals.service?.Service_Id;
+  const targetServiceId = res.locals.user?.Service_Id;
+  if (isNil(requestingServiceId)) {
+    logger.info(`'${req.path}' was hit without a requesting service id`);
+    return res.status(STATUSES.FORBIDDEN).send();
+  } else if (isNil(targetServiceId)) {
+    logger.info(
+      `'${req.path}' was hit without a target service id from a user`
+    );
+    return res.status(STATUSES.FORBIDDEN).send();
+  }
+
+  if (requestingServiceId !== targetServiceId) {
+    logger.warning(
+      `'${req.path}' was hit by service id '${requestingServiceId}' targeting service id '${targetServiceId}' from user id '${res.locals.user?.User_Id}'`
+    );
+    return res.status(STATUSES.FORBIDDEN).send();
   }
 
   return next();
