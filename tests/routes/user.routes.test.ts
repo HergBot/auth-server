@@ -2,12 +2,12 @@ import request from "supertest";
 
 import { STATUSES } from "../../src/constants/request.constants";
 import userController from "../../src/controllers/user.controller";
-import userRoutes, { USER_ROUTER_ROOT } from "../../src/routes/v1/user.routes";
+import userRouter, { USER_ROUTER_ROOT } from "../../src/routes/v1/user.routes";
 import testApp from "../data/test-app";
 import { TEST_SERVICE } from "../data/test-service";
 import { TEST_USER } from "../data/test-user";
 
-testApp.use(USER_ROUTER_ROOT, userRoutes);
+testApp.use(USER_ROUTER_ROOT, userRouter);
 
 let attachServiceData = true;
 

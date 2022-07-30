@@ -9,6 +9,8 @@ interface IServiceToken {
   Deactivated?: Date;
 }
 
+export type INewServiceToken = Omit<IServiceToken, "Service_Token_Id">;
+
 const ServiceToken = musqrat.initTable<IServiceToken, "Service_Token_Id">(
   "ServiceToken"
 );

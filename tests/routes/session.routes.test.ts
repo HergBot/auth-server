@@ -2,14 +2,14 @@ import request from "supertest";
 
 import authenticationController from "../../src/controllers/authentication.controller";
 import sessionController from "../../src/controllers/session.controller";
-import sessionRoutes, {
+import sessionRouter, {
   SESSION_ROUTER_ROOT,
 } from "../../src/routes/v1/session.routes";
 import testApp from "../data/test-app";
 import { TEST_SESSION } from "../data/test-session";
 import { TEST_USER } from "../data/test-user";
 
-testApp.use(SESSION_ROUTER_ROOT, sessionRoutes);
+testApp.use(SESSION_ROUTER_ROOT, sessionRouter);
 
 jest.mock("../../src/middleware/authentication.middleware", () => ({
   authenticateToken: jest.fn((req, res, next) => {

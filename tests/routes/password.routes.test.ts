@@ -2,14 +2,14 @@ import request from "supertest";
 
 import { STATUSES } from "../../src/constants/request.constants";
 import passwordController from "../../src/controllers/password.controller";
-import passwordRoutes, {
+import passwordRouter, {
   PASSWORD_ROUTER_ROOT,
 } from "../../src/routes/v1/password.routes";
 import testApp from "../data/test-app";
 import { TEST_PASSWORD } from "../data/test-password";
 import { TEST_USER } from "../data/test-user";
 
-testApp.use(PASSWORD_ROUTER_ROOT, passwordRoutes);
+testApp.use(PASSWORD_ROUTER_ROOT, passwordRouter);
 
 let attachUserData = true;
 let errorGeneratingSalt = false;

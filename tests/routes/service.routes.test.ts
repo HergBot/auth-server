@@ -2,7 +2,7 @@ import request from "supertest";
 import serviceController from "../../src/controllers/service.controller";
 
 import sessionController from "../../src/controllers/session.controller";
-import serviceRoutes, {
+import serviceRouter, {
   SERVICE_ROUTER_ROOT,
 } from "../../src/routes/v1/service.routes";
 import testApp from "../data/test-app";
@@ -10,7 +10,7 @@ import { TEST_SERVICE } from "../data/test-service";
 import { TEST_SESSION } from "../data/test-session";
 import { TEST_USER } from "../data/test-user";
 
-testApp.use(SERVICE_ROUTER_ROOT, serviceRoutes);
+testApp.use(SERVICE_ROUTER_ROOT, serviceRouter);
 
 jest.mock("../../src/middleware/authentication.middleware", () => ({
   authenticateToken: jest.fn((req, res, next) => {
