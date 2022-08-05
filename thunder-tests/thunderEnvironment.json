@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "eed0da73-3c4f-4c8b-ba2d-1ac670276312",
+    "name": "Local",
+    "default": true,
+    "sortNum": 10000,
+    "created": "2022-08-05T10:25:59.376Z",
+    "modified": "2022-08-05T10:48:21.464Z",
+    "data": [
+      {
+        "name": "server",
+        "value": "http://localhost:3000"
+      },
+      {
+        "name": "v1",
+        "value": "/v1"
+      },
+      {
+        "name": "authServerToken",
+        "value": "efd887dd-14aa-11ed-a91a-00ff8e78d7bf"
+      },
+      {
+        "name": "adminUser",
+        "value": "hergbot"
+      },
+      {
+        "name": "adminPass",
+        "value": "verysecurepassword"
+      },
+      {
+        "name": "authServerId",
+        "value": "1"
+      },
+      {
+        "name": "adminEmail",
+        "value": "hergbot@gmail.com"
+      }
+    ]
+  }
+]

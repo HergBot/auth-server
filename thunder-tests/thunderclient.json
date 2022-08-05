@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "06534981-af53-4035-9a21-7a8278545730",
+    "colId": "f5529650-0009-4f99-bf85-f3af389d3d70",
+    "containerId": "30c3eb98-4c78-47d2-93ea-d47efaf6ca52",
+    "name": "Create User",
+    "url": "{{server}}{{v1}}/user",
+    "method": "POST",
+    "sortNum": 10000,
+    "created": "2022-08-05T10:45:52.913Z",
+    "modified": "2022-08-05T10:49:42.555Z",
+    "headers": [
+      {
+        "name": "hergbot-service-token",
+        "value": "{{authServerToken}}"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"serviceId\": {{authServerId}},\n  \"username\": \"{{adminUser}}\",\n  \"email\": \"{{adminEmail}}\"\n}",
+      "form": []
+    },
+    "tests": []
+  }
+]
