@@ -30,7 +30,7 @@
         "dotenv": "^10.0.0",
         "express": "^4.17.3",
         "lodash": "^4.17.21",
-        "musqrat": "^0.1.15",
+        "musqrat": "^0.1.17",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
