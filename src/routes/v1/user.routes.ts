@@ -14,6 +14,21 @@ import { INewUser } from "../../schemas/user.schema";
 const USER_ROUTER_ROOT = "/user";
 const userRouter = express.Router();
 
+userRouter.get(
+  "/",
+  async (
+    req: Request,
+    res: ServiceAuthenticatedResponse,
+    next: NextFunction
+  ) => {
+    const user = await userController.find(6);
+    if (isNil(user)) {
+      return res.status(STATUSES.ERROR).send();
+    }
+    return res.status(STATUSES.OK).json(user);
+  }
+);
+
 userRouter.post(
   "/",
   authenticateServiceToken,
@@ -57,6 +72,36 @@ userRouter.post(
       `Created new user with username '${user.Username}' (user id '${user.User_Id}')`
     );
     return res.status(STATUSES.CREATED).json(user);
+  }
+);
+
+userRouter.put(
+  "/",
+  async (
+    req: Request,
+    res: ServiceAuthenticatedResponse,
+    next: NextFunction
+  ) => {
+    const user = await userController.update(6, { Username: "hergbot2" });
+    if (isNil(user)) {
+      return res.status(STATUSES.ERROR).send();
+    }
+    return res.status(STATUSES.OK).json(user);
+  }
+);
+
+userRouter.delete(
+  "/",
+  async (
+    req: Request,
+    res: ServiceAuthenticatedResponse,
+    next: NextFunction
+  ) => {
+    const user = await userController.deactivate(6, new Date());
+    if (isNil(user)) {
+      return res.status(STATUSES.ERROR).send();
+    }
+    return res.status(STATUSES.OK).json(user);
   }
 );
 

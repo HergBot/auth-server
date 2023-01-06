@@ -22,5 +22,47 @@
       "form": []
     },
     "tests": []
+  },
+  {
+    "_id": "f0e6de94-2bca-4516-84b7-b87d43abdcc5",
+    "colId": "f5529650-0009-4f99-bf85-f3af389d3d70",
+    "containerId": "30c3eb98-4c78-47d2-93ea-d47efaf6ca52",
+    "name": "Find User",
+    "url": "{{server}}{{v1}}/user",
+    "method": "GET",
+    "sortNum": 20000,
+    "created": "2022-10-15T10:10:01.599Z",
+    "modified": "2022-10-15T10:10:10.220Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "83ce148d-1208-4525-88bf-a5dc3c751f15",
+    "colId": "f5529650-0009-4f99-bf85-f3af389d3d70",
+    "containerId": "30c3eb98-4c78-47d2-93ea-d47efaf6ca52",
+    "name": "Update User",
+    "url": "{{server}}{{v1}}/user",
+    "method": "PUT",
+    "sortNum": 30000,
+    "created": "2022-10-15T10:10:54.446Z",
+    "modified": "2022-10-15T10:11:22.700Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "9912fe93-4c97-4c9b-bd58-ec3a59a54855",
+    "colId": "f5529650-0009-4f99-bf85-f3af389d3d70",
+    "containerId": "30c3eb98-4c78-47d2-93ea-d47efaf6ca52",
+    "name": "Deactivate User",
+    "url": "{{server}}{{v1}}/user",
+    "method": "DELETE",
+    "sortNum": 40000,
+    "created": "2022-10-15T10:11:17.195Z",
+    "modified": "2022-10-15T10:11:27.079Z",
+    "headers": [],
+    "params": [],
+    "tests": []
   }
 ]

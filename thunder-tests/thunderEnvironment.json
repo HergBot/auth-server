@@ -5,11 +5,11 @@
     "default": true,
     "sortNum": 10000,
     "created": "2022-08-05T10:25:59.376Z",
-    "modified": "2022-08-05T10:48:21.464Z",
+    "modified": "2022-10-15T09:38:31.573Z",
     "data": [
       {
         "name": "server",
-        "value": "http://localhost:3000"
+        "value": "http://localhost:3010"
       },
       {
         "name": "v1",
@@ -17,7 +17,7 @@
       },
       {
         "name": "authServerToken",
-        "value": "efd887dd-14aa-11ed-a91a-00ff8e78d7bf"
+        "value": "26ebe4dc-1202-11ed-a98b-2cf05d559498"
       },
       {
         "name": "adminUser",
