@@ -105,10 +105,13 @@ describe("[FILE]: session.middleware", () => {
         beforeEach(() => {
           jest
             .spyOn(sessionController, "find")
-            .mockResolvedValue({ ...TEST_SESSION, User_Id: 1000 });
+            .mockResolvedValue({
+              ...TEST_SESSION,
+              User_Id: DEACTIVATED_USER.User_Id,
+            });
         });
 
-        test("should return a 403", async () => {
+        test("should return a 403 debug-single", async () => {
           await callMiddleware();
           expect(status).toEqual(403);
         });

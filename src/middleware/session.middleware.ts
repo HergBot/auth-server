@@ -26,8 +26,10 @@ export const authorizeForSession = async (
   const sessionId = req.params.sessionId;
   // Make sure the session exists
   const session = await sessionController.find(sessionId);
+  console.log(session);
   if (isNil(session)) {
     const status = session === undefined ? 500 : 404;
+    console.log(status, session);
     return res.status(status).send();
   }
 

@@ -1,5 +1,6 @@
 import { isNil } from "lodash";
 import { getUpdates, SchemaUpdate, Table } from "musqrat";
+import { v4 as uuidV4 } from "uuid";
 
 import { ILogger } from "../../lib/logger";
 
@@ -22,8 +23,12 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
     newValue: Omit<Schema, PrimaryKey>
   ): Promise<Schema | null | undefined> {
     try {
-      const result = await this._table.insert(newValue).exec();
-      return this.getSingleResult(result);
+      const newId: Schema[PrimaryKey] = uuidV4() as any;
+      const insertValue = { ...newValue, [this._idField]: newId };
+      const result = await this._table.insert(insertValue).exec();
+      return result.affectedRows === 0
+        ? null
+        : (insertValue as unknown as Schema);
     } catch (err) {
       this._logger.error(`Failed to create ${this._table.name}`, "create");
       this._logger.debug(
@@ -46,7 +51,7 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
       return this.getSingleResult(result);
     } catch (err) {
       this._logger.error(`Failed to find ${this._table.name}`, "find");
-      this._logger.debug(`${this._idField}: ${id}`, "find");
+      this._logger.debug(`${this.IdField}: ${id}`, "find");
       this._logger.exception(err, "find");
       return undefined;
     }
@@ -67,7 +72,7 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
   public async update(
     id: Schema[PrimaryKey],
     modified: SchemaUpdate<Schema, PrimaryKey>
-  ): Promise<Schema | null | undefined> {
+  ): Promise<Partial<Schema> | null | undefined> {
     return this.updateSchema(id, modified, "update");
   }
 
@@ -83,32 +88,33 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
         method
       );
       this._logger.debug(
-        `${this._idField}: ${id}, modified: ${JSON.stringify(modified)}`,
+        `${this.IdField}: ${id}, modified: ${JSON.stringify(modified)}`,
         method
       );
       return null;
     }
     try {
-      const updated = await this._table
+      const result = await this._table
         .update(updates)
         .where(this._idField, "=", id)
         .exec();
-      const result = this.getSingleResult(updated);
-      if (isNil(result)) {
+      if (result.affectedRows === 0) {
         this._logger.warning(
           `Attempted to ${method} a ${this._table.name} but no updates were made`,
           method
         );
         this._logger.debug(
-          `${this._idField}: ${id}, modified: ${JSON.stringify(modified)}`,
+          `${this.IdField}: ${id}, modified: ${JSON.stringify(modified)}`,
           method
         );
       }
-      return result;
+      return result.affectedRows === 0
+        ? null
+        : ({ [this._idField]: id, ...modified } as unknown as Schema);
     } catch (err) {
       this._logger.error(`Failed to ${method} ${this._table.name}`, method);
       this._logger.debug(
-        `${this._idField}: ${id}, modified: ${JSON.stringify(
+        `${this.IdField}: ${id}, modified: ${JSON.stringify(
           modified
         )}, updates: ${JSON.stringify(updates)}`,
         method
@@ -120,6 +126,10 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
 
   protected getSingleResult(result: Schema[]): Schema | null {
     return result.length > 0 ? result[0] : null;
+  }
+
+  private get IdField(): string {
+    return this._idField.toString();
   }
 }
 

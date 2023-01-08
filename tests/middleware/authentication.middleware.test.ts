@@ -15,6 +15,7 @@ import {
   ServiceAuthenticatedResponse,
 } from "../../src/middleware/authentication.middleware";
 import { TEST_AUTHORIZATION_TOKEN } from "../data/test-data";
+import { HERGBOT_AUTH_SERVICE_ADMIN_ROLE } from "../data/test-role";
 import { DEACTIVATED_SERVICE, TEST_SERVICE } from "../data/test-service";
 import {
   DEACTIVATED_SERVICE_TOKEN,
@@ -288,7 +289,7 @@ describe("[FILE]: authentication.middleware", () => {
           beforeEach(() => {
             jest.spyOn(userRoleController, "find").mockResolvedValue({
               User_Id: HERGBOT_AUTH_ADMIN_USER.User_Id,
-              Role_Id: HERGBOT_AUTH_ADMIN_USER.Service_Id,
+              Role_Id: HERGBOT_AUTH_SERVICE_ADMIN_ROLE.Role_Id,
             });
           });
 

@@ -1,8 +1,10 @@
 import musqrat from "musqrat";
 
+import { IService } from "./service.schema";
+
 interface IUser {
-  User_Id: number;
-  Service_Id: number;
+  User_Id: string; // Binary
+  Service_Id: IService["Service_Id"];
   Username: string;
   Email: string;
   Created: Date;
@@ -11,7 +13,7 @@ interface IUser {
 
 export type INewUser = Omit<IUser, "User_Id">;
 
-const User = musqrat.initTable<IUser, "User_Id">("User");
+const User = musqrat.initTable<IUser>("User");
 
 export default User;
 export { IUser };

@@ -28,7 +28,7 @@ class DualKeyController<
   public async create(newValue: Schema): Promise<Schema | null | undefined> {
     try {
       const result = await this._table.insert(newValue).exec();
-      return this.getSingleResult(result);
+      return result.affectedRows === 0 ? null : newValue;
     } catch (err) {
       this._logger.error(`Failed to create ${this._table.name}`, "create");
       this._logger.debug(
@@ -66,7 +66,7 @@ class DualKeyController<
     } catch (err) {
       this._logger.error(`Failed to find ${this._table.name}`, "find");
       this._logger.debug(
-        `${this._idFieldOne}: ${idOne}, ${this._idFieldTwo}: ${idTwo}`,
+        `${this.IdFieldOne}: ${idOne}, ${this.IdFieldTwo}: ${idTwo}`,
         "find"
       );
       this._logger.exception(err, "find");
@@ -107,15 +107,15 @@ class DualKeyController<
         method
       );
       this._logger.debug(
-        `${this._idFieldOne}: ${idOne}, ${
-          this._idFieldTwo
+        `${this.IdFieldOne}: ${idOne}, ${
+          this.IdFieldTwo
         }: ${idTwo}, modified: ${JSON.stringify(modified)}`,
         method
       );
       return null;
     }
     try {
-      const updated = await this._table
+      const result = await this._table
         .update(updates)
         .where({
           AND: [
@@ -132,25 +132,30 @@ class DualKeyController<
           ],
         })
         .exec();
-      const result = this.getSingleResult(updated);
-      if (isNil(result)) {
+      if (result.affectedRows === 0) {
         this._logger.warning(
           `Attempted to ${method} a ${this._table.name} but no updates were made`,
           method
         );
         this._logger.debug(
-          `${this._idFieldOne}: ${idOne}, ${
-            this._idFieldTwo
+          `${this.IdFieldOne}: ${idOne}, ${
+            this.IdFieldTwo
           }: ${idTwo}, modified: ${JSON.stringify(modified)}`,
           method
         );
       }
-      return result;
+      result.affectedRows === 0
+        ? null
+        : ({
+            [this._idFieldOne]: idOne,
+            [this._idFieldTwo]: idTwo,
+            ...modified,
+          } as unknown as Schema);
     } catch (err) {
       this._logger.error(`Failed to ${method} ${this._table.name}`, method);
       this._logger.debug(
-        `${this._idFieldOne}: ${idOne}, ${
-          this._idFieldTwo
+        `${this.IdFieldOne}: ${idOne}, ${
+          this.IdFieldTwo
         }: ${idTwo}, modified: ${JSON.stringify(
           modified
         )}, updates: ${JSON.stringify(updates)}`,
@@ -163,6 +168,14 @@ class DualKeyController<
 
   private getSingleResult(result: Schema[]): Schema | null {
     return result.length > 0 ? result[0] : null;
+  }
+
+  private get IdFieldOne(): string {
+    return this._idFieldOne.toString();
+  }
+
+  private get IdFieldTwo(): string {
+    return this._idFieldTwo.toString();
   }
 }
 

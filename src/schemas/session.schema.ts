@@ -1,8 +1,10 @@
 import musqrat from "musqrat";
 
+import { IUser } from "./user.schema";
+
 interface ISession {
-  Session_Id: string;
-  User_Id: number;
+  Session_Id: string; // Binary
+  User_Id: IUser["User_Id"];
   Refresh_Token: string;
   Expires: Date;
   Created: Date;

@@ -12,7 +12,7 @@ class AuthenticationController {
   }
 
   public async login(
-    serviceId: number,
+    serviceId: string,
     username: string,
     password: string
   ): Promise<IUser | null | undefined> {

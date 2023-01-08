@@ -1,10 +1,12 @@
 import musqrat from "musqrat";
 
+import { IUser } from "./user.schema";
+
 export type PasswordVersion = "v1";
 
 interface IPassword {
-  Password_Id: number;
-  User_Id: number;
+  Password_Id: string; // Binary
+  User_Id: IUser["User_Id"];
   Password_Hash: string;
   Salt: string;
   Version: PasswordVersion;
