@@ -1,16 +1,11 @@
 CREATE TABLE Session
 (
-    Session_Id VARCHAR(36) NOT NULL,
-    User_Id INT NOT NULL,
-    Refresh_Token VARCHAR(36) NOT NULL,
+    Session_Id BINARY(16) NOT NULL,
+    User_Id BINARY(16) NOT NULL,
+    Refresh_Token BINARY(16) NOT NULL,
     Expires DATETIME NOT NULL,
     Created DATETIME NOT NULL,
     Deactivated DATETIME DEFAULT NULL,
     PRIMARY KEY (Session_Id),
     FOREIGN KEY (User_Id) REFERENCES User(User_Id)
 );
-
-CREATE TRIGGER Before_Insert_Session
-    BEFORE INSERT ON Session
-    FOR EACH ROW
-    SET new.Session_Id = UUID();
