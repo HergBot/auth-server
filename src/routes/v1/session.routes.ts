@@ -21,6 +21,7 @@ import {
   validateSessionUpdate,
 } from "../../middleware/session.middleware";
 import { INewSession, ISession } from "../../schemas/session.schema";
+import { getBinaryBody } from "../../utils/middleware.utils";
 
 const SESSION_ROUTER_ROOT = "/session";
 const sessionRouter = express.Router();
@@ -47,9 +48,9 @@ sessionRouter.post(
   authenticateServiceToken,
   authenticateServiceForService,
   async (req: Request, res: Response) => {
-    const serviceId = req.body.serviceId;
-    const username = req.body.username;
-    const password = req.body.password;
+    const serviceId = getBinaryBody(req, "serviceId");
+    const username = req.body.username as string;
+    const password = req.body.password as string;
 
     if (isNil(serviceId)) {
       logger.warning(`'${req.path}' was hit without a service id`);

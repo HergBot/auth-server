@@ -1,4 +1,3 @@
-import { json } from "body-parser";
 import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import { isNil } from "lodash";

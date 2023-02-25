@@ -14,7 +14,13 @@ import userController from "../controllers/user.controller";
 import logger from "../lib/console-logger";
 import { IService } from "../schemas/service.schema";
 import { IUser } from "../schemas/user.schema";
-import { anyHeaders, hasHeader } from "../utils/middleware.utils";
+import { matchIds } from "../utils/common.utils";
+import {
+  anyHeaders,
+  getBinaryBody,
+  getBinaryHeader,
+  hasHeader,
+} from "../utils/middleware.utils";
 
 export interface ServiceAuthenticatedLocals extends Record<string, any> {
   service?: IService;
@@ -41,13 +47,15 @@ export const getUserTokenData = async (
   if (!anyHeaders(req)) {
     logger.info(`'${req.path}' was hit without any headers`);
     return res.status(403).send();
-  } else if (!hasHeader(req, HEADERS.AUTHORIZATION)) {
+  }
+
+  const token = getBinaryHeader(req, HEADERS.AUTHORIZATION);
+  if (isNil(token)) {
     logger.info(`'${req.path}' was hit without an authorization header`);
     return res.status(403).send();
   }
 
   // Query for session, user, and service
-  const token = req.get(HEADERS.AUTHORIZATION) || "";
   // TODO: Make a way to query session, user, and service info in one call. Do the same for a getServiceTokenData function
   // so we can take all queries out of middleware where possible.
   // Check if the user is with the Herg Bot Auth Service and is an admin
@@ -64,7 +72,7 @@ export const authenticateToken = async (
   }
 
   // Check if token exists
-  const token = req.headers.authorization;
+  const token = getBinaryHeader(req, HEADERS.AUTHORIZATION);
   if (isNil(token)) {
     logger.info(`'${req.path}' was hit without a token`);
     return res.status(403).send();
@@ -125,7 +133,7 @@ export const authenticateHergBotAdminToken = async (
   }
 
   // Check if the user belongs to the Herg Bot Auth Service
-  if (res.locals.user.Service_Id !== HERGBOT_AUTH_SERVICE_ID) {
+  if (!matchIds(res.locals.user.Service_Id, HERGBOT_AUTH_SERVICE_ID)) {
     logger.warning(
       `Admin end point '${req.path}' was hit by non-admin user '${res.locals.user.User_Id}'`
     );
@@ -163,14 +171,19 @@ export const authenticateServiceToken = async (
   if (!anyHeaders(req)) {
     logger.info(`'${req.path}' was hit without any headers`);
     return res.status(403).send();
-  } else if (!hasHeader(req, HEADERS.HERGBOT_SERVICE_TOKEN)) {
+  }
+
+  // Check if the service token exists
+  const serviceTokenHeader = getBinaryHeader(
+    req,
+    HEADERS.HERGBOT_SERVICE_TOKEN
+  );
+  if (isNil(serviceTokenHeader)) {
     logger.info(`'${req.path}' was hit without a service token`);
     return res.status(403).send();
   }
 
-  // Check if the service token exists
   const now = new Date();
-  const serviceTokenHeader = req.get(HEADERS.HERGBOT_SERVICE_TOKEN) || "";
   const serviceToken = await serviceTokenController.find(serviceTokenHeader);
   if (isNil(serviceToken)) {
     if (serviceToken === undefined) {
@@ -229,7 +242,7 @@ export const authenticateServiceForService = async (
   next: NextFunction
 ): Promise<ServiceAuthenticatedResponse | void> => {
   const requestingServiceId = res.locals.service?.Service_Id;
-  const targetServiceId = req.body?.serviceId;
+  const targetServiceId = getBinaryBody(req, "serviceId");
   if (isNil(requestingServiceId)) {
     logger.info(`'${req.path}' was hit without a requesting service id`);
     return res.status(403).send();
@@ -238,7 +251,7 @@ export const authenticateServiceForService = async (
     return res.status(403).send();
   }
 
-  if (requestingServiceId !== targetServiceId) {
+  if (!matchIds(requestingServiceId, targetServiceId)) {
     logger.warning(
       `'${req.path}' was hit by service id '${requestingServiceId}' targeting service id '${targetServiceId}'`
     );
@@ -265,7 +278,7 @@ export const authenticateServiceForUser = async (
     return res.status(STATUSES.FORBIDDEN).send();
   }
 
-  if (requestingServiceId !== targetServiceId) {
+  if (!matchIds(requestingServiceId, targetServiceId)) {
     logger.warning(
       `'${req.path}' was hit by service id '${requestingServiceId}' targeting service id '${targetServiceId}' from user id '${res.locals.user?.User_Id}'`
     );

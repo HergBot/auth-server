@@ -52,6 +52,7 @@ describe("[FILE]: authentication.middleware", () => {
     beforeEach(() => {
       mockRequest = {
         path: "/authentication-middleware/test",
+        get: () => undefined,
       };
       mockResponse = {
         status: (code: Number): Response => {
@@ -91,6 +92,7 @@ describe("[FILE]: authentication.middleware", () => {
           headers: {
             authorization: TEST_AUTHORIZATION_TOKEN,
           },
+          get: () => TEST_AUTHORIZATION_TOKEN as any,
         };
       });
 
@@ -357,6 +359,7 @@ describe("[FILE]: authentication.middleware", () => {
         mockRequest.headers = {
           [HEADERS.HERGBOT_SERVICE_TOKEN]: "service_token",
         };
+        mockRequest.get = () => "service_token" as any;
       });
 
       describe("when there is an error finding the service token", () => {
@@ -489,6 +492,7 @@ describe("[FILE]: authentication.middleware", () => {
     beforeEach(() => {
       mockRequest = {
         path: "/authentication-middleware/test",
+        body: {},
       };
       mockResponse = {
         status: (code: Number): ServiceAuthenticatedResponse => {
@@ -514,10 +518,6 @@ describe("[FILE]: authentication.middleware", () => {
       });
 
       describe("when a service id is not included in the body", () => {
-        beforeEach(() => {
-          mockRequest.body = {};
-        });
-
         test("should return 403", async () => {
           await callMiddleware();
           expect(status).toEqual(403);

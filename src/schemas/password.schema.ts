@@ -5,7 +5,7 @@ import { IUser } from "./user.schema";
 export type PasswordVersion = "v1";
 
 interface IPassword {
-  Password_Id: string; // Binary
+  Password_Id: Buffer;
   User_Id: IUser["User_Id"];
   Password_Hash: string;
   Salt: string;

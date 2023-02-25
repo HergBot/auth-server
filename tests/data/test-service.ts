@@ -7,13 +7,13 @@ import { IService } from "../../src/schemas/service.schema";
 const now = new Date();
 
 export const TEST_SERVICE: IService = {
-  Service_Id: "test-service-id",
+  Service_Id: Buffer.from("test-service-id", "ascii"),
   Name: "Test Service",
   Created: now,
 };
 
 export const DEACTIVATED_SERVICE: IService = {
-  Service_Id: "deactivated-service-id",
+  Service_Id: Buffer.from("deactivated-service-id", "ascii"),
   Name: "Deactivated Test Service",
   Created: subHours(now, 4),
   Deactivated: subHours(now, 2),

@@ -8,6 +8,7 @@ import {
 } from "musqrat";
 import controller from "../../src/controllers/session.controller";
 import Session, { ISession } from "../../src/schemas/session.schema";
+import { TEST_ID } from "../data/test-data";
 import TestLogger from "../data/test-logger";
 import { TEST_SESSION } from "../data/test-session";
 
@@ -73,7 +74,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       it("should return undefined", async () => {
-        const result = await controller.deactivate("1", now);
+        const result = await controller.deactivate(TEST_ID, now);
         expect(result).toEqual(undefined);
       });
     });
@@ -88,7 +89,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       it("should return null", async () => {
-        const result = await controller.deactivate("999", now);
+        const result = await controller.deactivate(TEST_ID, now);
         expect(result).toEqual(null);
       });
     });
@@ -107,7 +108,11 @@ describe("[CLASS]: SessionController", () => {
       });
 
       it("should return the session", async () => {
-        const result = await controller.deactivate("1", now);
+        const result = await controller.deactivate(
+          TEST_SESSION.Session_Id,
+          now
+        );
+        console.log(result?.Session_Id?.toString("hex"));
         expect(result).toEqual(updated);
       });
     });
@@ -126,7 +131,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       test("should throw an error", async () => {
-        const result = await controller.find("1");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(undefined);
       });
     });
@@ -137,7 +142,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       test("should return null", async () => {
-        const result = await controller.find("1");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(null);
       });
     });
@@ -148,7 +153,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       test("should return an empty array", async () => {
-        const result = await controller.find("1");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(TEST_SESSION);
       });
     });
@@ -222,7 +227,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       it("should return undefined", async () => {
-        const result = await controller.update("1", {
+        const result = await controller.update(TEST_ID, {
           Deactivated: new Date(),
         });
         expect(result).toEqual(undefined);
@@ -239,7 +244,7 @@ describe("[CLASS]: SessionController", () => {
       });
 
       it("should return null", async () => {
-        const result = await controller.update("999", {
+        const result = await controller.update(TEST_ID, {
           Deactivated: new Date(),
         });
         expect(result).toEqual(null);
@@ -268,7 +273,7 @@ describe("[CLASS]: SessionController", () => {
     });
 
     it("should return null when there are no valid updates", async () => {
-      const result = await controller.update("1", {});
+      const result = await controller.update(TEST_ID, {});
       expect(result).toEqual(null);
     });
   });

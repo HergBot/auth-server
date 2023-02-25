@@ -5,7 +5,7 @@ import { TEST_USER } from "./test-user";
 const now = new Date();
 
 export const TEST_PASSWORD: IPassword = {
-  Password_Id: "test-password-id",
+  Password_Id: Buffer.from("test-password-id", "ascii"),
   User_Id: TEST_USER.User_Id,
   Password_Hash: "password-hash",
   Salt: "salty",

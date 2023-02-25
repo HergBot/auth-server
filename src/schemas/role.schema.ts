@@ -3,7 +3,7 @@ import musqrat from "musqrat";
 import { IService } from "./service.schema";
 
 interface IRole {
-  Role_Id: string; // Binary
+  Role_Id: Buffer;
   Service_Id: IService["Service_Id"];
   Name: string;
   Created: Date;

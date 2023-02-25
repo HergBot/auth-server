@@ -3,7 +3,7 @@ import musqrat from "musqrat";
 import { IService } from "./service.schema";
 
 interface IUser {
-  User_Id: string; // Binary
+  User_Id: Buffer;
   Service_Id: IService["Service_Id"];
   Username: string;
   Email: string;

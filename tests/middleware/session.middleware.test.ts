@@ -42,7 +42,7 @@ describe("[FILE]: session.middleware", () => {
       mockRequest = {
         path: "/session-middleware/test",
         params: {
-          sessionId: TEST_SESSION.Session_Id,
+          sessionId: TEST_SESSION.Session_Id.toString("ascii"),
         },
       };
       mockResponse = {
@@ -103,15 +103,13 @@ describe("[FILE]: session.middleware", () => {
 
       describe("when the session owner does not match the current user", () => {
         beforeEach(() => {
-          jest
-            .spyOn(sessionController, "find")
-            .mockResolvedValue({
-              ...TEST_SESSION,
-              User_Id: DEACTIVATED_USER.User_Id,
-            });
+          jest.spyOn(sessionController, "find").mockResolvedValue({
+            ...TEST_SESSION,
+            User_Id: DEACTIVATED_USER.User_Id,
+          });
         });
 
-        test("should return a 403 debug-single", async () => {
+        test("should return a 403", async () => {
           await callMiddleware();
           expect(status).toEqual(403);
         });
@@ -156,7 +154,7 @@ describe("[FILE]: session.middleware", () => {
       mockRequest = {
         path: "/session-middleware/test",
         params: {
-          sessionId: TEST_SESSION.Session_Id,
+          sessionId: TEST_SESSION.Session_Id.toString("ascii"),
         },
       };
       mockResponse = {
@@ -276,7 +274,7 @@ describe("[FILE]: session.middleware", () => {
       mockRequest = {
         path: "/session-middleware/test",
         params: {
-          sessionId: TEST_SESSION.Session_Id,
+          sessionId: TEST_SESSION.Session_Id.toString("ascii"),
         },
       };
       mockResponse = {

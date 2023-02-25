@@ -1,6 +1,7 @@
 import logger from "../lib/console-logger";
 import { ILogger } from "../lib/logger";
-import Password from "../schemas/password.schema";
+import Password, { IPassword } from "../schemas/password.schema";
+import { IService } from "../schemas/service.schema";
 import User, { IUser } from "../schemas/user.schema";
 import { verifyPassword } from "../utils/authentication.utils";
 
@@ -12,8 +13,8 @@ class AuthenticationController {
   }
 
   public async login(
-    serviceId: string,
-    username: string,
+    serviceId: IService["Service_Id"],
+    username: IUser["Username"],
     password: string
   ): Promise<IUser | null | undefined> {
     try {

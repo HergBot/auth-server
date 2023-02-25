@@ -21,7 +21,7 @@ userRouter.get(
     res: ServiceAuthenticatedResponse,
     next: NextFunction
   ) => {
-    const user = await userController.find("");
+    const user = await userController.find(Buffer.from(""));
     if (isNil(user)) {
       return res.status(STATUSES.ERROR).send();
     }
@@ -82,7 +82,9 @@ userRouter.put(
     res: ServiceAuthenticatedResponse,
     next: NextFunction
   ) => {
-    const user = await userController.update("", { Username: "hergbot2" });
+    const user = await userController.update(Buffer.from(""), {
+      Username: "hergbot2",
+    });
     if (isNil(user)) {
       return res.status(STATUSES.ERROR).send();
     }
@@ -97,7 +99,7 @@ userRouter.delete(
     res: ServiceAuthenticatedResponse,
     next: NextFunction
   ) => {
-    const user = await userController.deactivate("", new Date());
+    const user = await userController.deactivate(Buffer.from(""), new Date());
     if (isNil(user)) {
       return res.status(STATUSES.ERROR).send();
     }

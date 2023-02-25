@@ -9,7 +9,8 @@
         "test": "jest",
         "test-watch": "jest --watch",
         "test-watch-all": "jest --watchAll",
-        "test-debug-single": "jest -t 'debug-single'"
+        "test-debug-single": "jest -t 'debug-single'",
+        "test-script": "tsc src/test.ts"
     },
     "repository": {
         "type": "git",
@@ -27,6 +28,7 @@
     "homepage": "https://github.com/HergBot/auth-server#readme",
     "dependencies": {
         "bcrypt": "^5.0.1",
+        "binary-uuid": "^2.0.3",
         "date-fns": "^2.28.0",
         "dotenv": "^10.0.0",
         "express": "^4.17.3",

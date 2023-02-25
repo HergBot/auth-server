@@ -3,7 +3,7 @@ import musqrat from "musqrat";
 import { IService } from "./service.schema";
 
 interface IServiceToken {
-  Service_Token_Id: string;
+  Service_Token_Id: Buffer;
   Service_Id: IService["Service_Id"];
   Description: string;
   Created: Date;

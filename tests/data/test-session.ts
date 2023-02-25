@@ -6,7 +6,7 @@ import { TEST_USER } from "./test-user";
 const now = new Date();
 
 export const TEST_SESSION: ISession = {
-  Session_Id: "1",
+  Session_Id: Buffer.from("1", "ascii"),
   User_Id: TEST_USER.User_Id,
   Refresh_Token: "refresh_token",
   Expires: addHours(now, 4),
@@ -14,7 +14,7 @@ export const TEST_SESSION: ISession = {
 };
 
 export const EXPIRED_SESSION: ISession = {
-  Session_Id: "2",
+  Session_Id: Buffer.from("2", "ascii"),
   User_Id: TEST_USER.User_Id,
   Refresh_Token: "refresh_token",
   Expires: subHours(now, 4),
@@ -22,7 +22,7 @@ export const EXPIRED_SESSION: ISession = {
 };
 
 export const DEACTIVATED_SESSION: ISession = {
-  Session_Id: "3",
+  Session_Id: Buffer.from("3", "ascii"),
   User_Id: TEST_USER.User_Id,
   Refresh_Token: "refresh_token",
   Expires: addHours(now, 3),

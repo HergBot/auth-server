@@ -9,13 +9,14 @@ import {
   ServiceAuthenticatedResponse,
   UserAuthenticatedResponse,
 } from "../middleware/authentication.middleware";
+import { getBinaryBody } from "../utils/middleware.utils";
 
 export const attachUserData = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<UserAuthenticatedResponse | void> => {
-  const userId = req.body.userId;
+  const userId = getBinaryBody(req, "userId");
   if (isNil(userId)) {
     logger.info(`'${req.path}' was hit without a user id`);
     return res.status(STATUSES.BAD_REQUEST).send();
@@ -50,7 +51,7 @@ export const attachServiceData = async (
   res: Response,
   next: NextFunction
 ): Promise<ServiceAuthenticatedResponse | void> => {
-  const serviceId = req.body.serviceId;
+  const serviceId = getBinaryBody(req, "serviceId");
   if (isNil(serviceId)) {
     logger.info(`'${req.path}' was hit without a service id`);
     return res.status(STATUSES.BAD_REQUEST).send();

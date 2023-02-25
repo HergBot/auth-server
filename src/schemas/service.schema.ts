@@ -1,7 +1,7 @@
 import musqrat from "musqrat";
 
 interface IService {
-  Service_Id: string; // Binary
+  Service_Id: Buffer;
   Name: string;
   Created: Date;
   Deactivated?: Date;

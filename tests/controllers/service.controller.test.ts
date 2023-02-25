@@ -8,6 +8,7 @@ import {
 } from "musqrat";
 import controller from "../../src/controllers/service.controller";
 import Service, { IService } from "../../src/schemas/service.schema";
+import { TEST_ID } from "../data/test-data";
 import TestLogger from "../data/test-logger";
 import { TEST_SERVICE } from "../data/test-service";
 
@@ -73,7 +74,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       it("should return undefined", async () => {
-        const result = await controller.deactivate("id", now);
+        const result = await controller.deactivate(TEST_ID, now);
         expect(result).toEqual(undefined);
       });
     });
@@ -88,7 +89,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       it("should return null", async () => {
-        const result = await controller.deactivate("id", now);
+        const result = await controller.deactivate(TEST_ID, now);
         expect(result).toEqual(null);
       });
     });
@@ -129,7 +130,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       test("should throw an error", async () => {
-        const result = await controller.find("id");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(undefined);
       });
     });
@@ -140,7 +141,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       test("should return null", async () => {
-        const result = await controller.find("id");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(null);
       });
     });
@@ -151,7 +152,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       test("should return an empty array", async () => {
-        const result = await controller.find("id");
+        const result = await controller.find(TEST_ID);
         expect(result).toEqual(TEST_SERVICE);
       });
     });
@@ -224,7 +225,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       it("should return undefined", async () => {
-        const result = await controller.update("id", { Name: "another" });
+        const result = await controller.update(TEST_ID, { Name: "another" });
         expect(result).toEqual(undefined);
       });
     });
@@ -239,7 +240,7 @@ describe("[CLASS]: ServiceController", () => {
       });
 
       it("should return null", async () => {
-        const result = await controller.update("id", {
+        const result = await controller.update(TEST_ID, {
           Name: "another",
         });
         expect(result).toEqual(null);
@@ -265,7 +266,7 @@ describe("[CLASS]: ServiceController", () => {
     });
 
     it("should return null when there are no valid updates", async () => {
-      const result = await controller.update("id", {});
+      const result = await controller.update(TEST_ID, {});
       expect(result).toEqual(null);
     });
   });

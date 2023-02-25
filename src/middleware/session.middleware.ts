@@ -8,6 +8,7 @@ import {
   SessionUpdateResponse,
 } from "../routes/v1/session.routes";
 import { parseDate } from "../utils/common.utils";
+import { getBinaryParam } from "../utils/middleware.utils";
 import { validateSessionExpiry } from "../utils/session.utils";
 import { UserAuthenticatedResponse } from "./authentication.middleware";
 
@@ -23,13 +24,17 @@ export const authorizeForSession = async (
     return res.status(500).send();
   }
 
-  const sessionId = req.params.sessionId;
+  const sessionId = getBinaryParam(req, "sessionId");
+  if (isNil(sessionId)) {
+    logger.warning(
+      `Authorizing for session with missing sessionId. sessionId: ${sessionId}`
+    );
+    return res.status(404).send();
+  }
   // Make sure the session exists
   const session = await sessionController.find(sessionId);
-  console.log(session);
   if (isNil(session)) {
     const status = session === undefined ? 500 : 404;
-    console.log(status, session);
     return res.status(status).send();
   }
 

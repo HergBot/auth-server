@@ -3,7 +3,7 @@ import musqrat from "musqrat";
 import { IUser } from "./user.schema";
 
 interface ISession {
-  Session_Id: string; // Binary
+  Session_Id: Buffer;
   User_Id: IUser["User_Id"];
   Refresh_Token: string;
   Expires: Date;
