@@ -1,6 +1,6 @@
+import { createBinaryUUID } from "binary-uuid";
 import { isNil } from "lodash";
 import { getUpdates, SchemaUpdate, Table } from "musqrat";
-import { v4 as uuidV4 } from "uuid";
 
 import { ILogger } from "../../lib/logger";
 
@@ -23,7 +23,7 @@ class BaseController<Schema, PrimaryKey extends keyof Schema> {
     newValue: Omit<Schema, PrimaryKey>
   ): Promise<Schema | null | undefined> {
     try {
-      const newId: Schema[PrimaryKey] = uuidV4() as any;
+      const newId: Schema[PrimaryKey] = createBinaryUUID().buffer as any;
       const insertValue = { ...newValue, [this._idField]: newId };
       const result = await this._table.insert(insertValue).exec();
       return result.affectedRows === 0

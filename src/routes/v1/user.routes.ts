@@ -2,7 +2,9 @@ import express, { NextFunction, Request, Response } from "express";
 import { isNil } from "lodash";
 
 import { STATUSES } from "../../constants/request.constants";
-import userController from "../../controllers/user.controller";
+import userController, {
+  UserValidationError,
+} from "../../controllers/user.controller";
 import logger from "../../lib/console-logger";
 import {
   authenticateServiceForService,
@@ -58,6 +60,18 @@ userRouter.post(
       Email: email,
       Created: new Date(),
     };
+    const validationCode = await userController.validate(newUser);
+    if (validationCode !== null) {
+      let error = "Unable to create user";
+      switch (validationCode) {
+        case UserValidationError.USERNAME_ALREADY_EXISTS:
+          error = "Username already exists.";
+          break;
+      }
+      return res
+        .status(400)
+        .json({ error: { code: validationCode, message: error } });
+    }
     const user = await userController.create(newUser);
     if (isNil(user)) {
       if (user === undefined) {
@@ -69,9 +83,15 @@ userRouter.post(
     }
 
     logger.info(
-      `Created new user with username '${user.Username}' (user id '${user.User_Id}')`
+      `Created new user with username '${
+        user.Username
+      }' (user id '${user.User_Id.toString("hex")}')`
     );
-    return res.status(STATUSES.CREATED).json(user);
+    return res.status(STATUSES.CREATED).json({
+      ...user,
+      User_Id: user.User_Id.toString("hex"),
+      Service_Id: user.Service_Id.toString("hex"),
+    });
   }
 );
 

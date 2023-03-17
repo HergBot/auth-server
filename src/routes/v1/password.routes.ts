@@ -46,14 +46,18 @@ passwordRouter.post(
     const salt = await generateSalt(CURRENT_PASSWORD_VERSION);
     if (isNil(salt)) {
       logger.error(
-        `Failed to create password for user id '${res.locals.user.User_Id}' because of a undefined salt`
+        `Failed to create password for user id '${res.locals.user.User_Id.toString(
+          "hex"
+        )}' because of a undefined salt`
       );
       return res.status(STATUSES.ERROR).send();
     }
     const hash = await hashPassword(password, salt, CURRENT_PASSWORD_VERSION);
     if (isNil(hash)) {
       logger.error(
-        `Failed to create password for user id '${res.locals.user.User_Id}' because of a undefined hash`
+        `Failed to create password for user id '${res.locals.user.User_Id.toString(
+          "hex"
+        )}' because of a undefined hash`
       );
       return res.status(STATUSES.ERROR).send();
     }
@@ -69,18 +73,24 @@ passwordRouter.post(
     if (isNil(passwordRecord)) {
       if (passwordRecord === undefined) {
         logger.error(
-          `Error creating password for user id '${res.locals.user.User_Id}'`
+          `Error creating password for user id '${res.locals.user.User_Id.toString(
+            "hex"
+          )}'`
         );
       } else {
         logger.warning(
-          `Failed to create password for user id '${res.locals.user.User_Id}'`
+          `Failed to create password for user id '${res.locals.user.User_Id.toString(
+            "hex"
+          )}'`
         );
       }
       return res.status(STATUSES.ERROR).send();
     }
 
     logger.info(
-      `Created new password for user id '${res.locals.user.User_Id}')`
+      `Created new password for user id '${res.locals.user.User_Id.toString(
+        "hex"
+      )}')`
     );
     return res.status(STATUSES.CREATED).json();
   }

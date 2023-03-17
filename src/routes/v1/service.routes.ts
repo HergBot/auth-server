@@ -39,7 +39,9 @@ serviceRouter.post(
     }
 
     logger.info(
-      `Created new service with name '${service.Name}' (service id '${service.Service_Id}')`
+      `Created new service with name '${
+        service.Name
+      }' (service id '${service.Service_Id.toString("hex")}')`
     );
     return res.status(STATUSES.CREATED).json(service);
   }

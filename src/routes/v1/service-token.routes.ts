@@ -62,18 +62,24 @@ serviceTokenRouter.post(
     if (isNil(serviceTokenRecord)) {
       if (serviceTokenRecord === undefined) {
         logger.error(
-          `Error creating service token for service id '${res.locals.service.Service_Id}'`
+          `Error creating service token for service id '${res.locals.service.Service_Id.toString(
+            "hex"
+          )}'`
         );
       } else {
         logger.warning(
-          `Failed to create service token for service id '${res.locals.service.Service_Id}'`
+          `Failed to create service token for service id '${res.locals.service.Service_Id.toString(
+            "hex"
+          )}'`
         );
       }
       return res.status(STATUSES.ERROR).send();
     }
 
     logger.info(
-      `Created new service token for service id '${res.locals.service.Service_Id}')`
+      `Created new service token for service id '${res.locals.service.Service_Id.toString(
+        "hex"
+      )}')`
     );
     return res.status(STATUSES.CREATED).json(serviceTokenRecord);
   }

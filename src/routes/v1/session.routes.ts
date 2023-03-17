@@ -71,12 +71,16 @@ sessionRouter.post(
     if (isNil(verifiedUser)) {
       if (verifiedUser === undefined) {
         logger.error(
-          `Error verifying user credentials for username '${username}' (service id '${serviceId}')`
+          `Error verifying user credentials for username '${username}' (service id '${serviceId.toString(
+            "hex"
+          )}')`
         );
         return res.status(500).send();
       }
       logger.info(
-        `Username '${username}' failed to login to service '${serviceId}'`
+        `Username '${username}' failed to login to service '${serviceId.toString(
+          "hex"
+        )}'`
       );
       return res.status(403).send();
     }
@@ -92,18 +96,24 @@ sessionRouter.post(
     if (isNil(session)) {
       if (session === undefined) {
         logger.error(
-          `Error creating a session for username '${username}' (service id '${serviceId}')`
+          `Error creating a session for username '${username}' (service id '${serviceId.toString(
+            "hex"
+          )}')`
         );
       } else {
         logger.warning(
-          `Failed to make session for username '${username}' (service id '${serviceId}')`
+          `Failed to make session for username '${username}' (service id '${serviceId.toString(
+            "hex"
+          )}')`
         );
       }
       return res.status(500).send();
     }
 
     logger.info(
-      `New session created for username '${username}' (service id '${serviceId}')`
+      `New session created for username '${username}' (service id '${serviceId.toString(
+        "hex"
+      )}')`
     );
     return res.status(200).json(session);
   }
